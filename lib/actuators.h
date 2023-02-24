@@ -5,8 +5,10 @@
 #include <TaskManager.h>
 #include <ezButton.h>
 
-//#define LOCAL_DEBUG
+#define LOCAL_DEBUG
 #include "myLogger.h"
+
+//#include "..\lib\model.h"
 
 
 #define PIN_THROTTLE A0
@@ -53,10 +55,33 @@ ezButton switch1(PIN_SWITCH_1);
 ezButton switch2a(PIN_SWITCH_2a);
 ezButton switch2b(PIN_SWITCH_2b);
 
+ezButton buttonArray[] = {
+    ezButton(PIN_BUTTON_1),
+    ezButton(PIN_BUTTON_2),
+    ezButton(PIN_BUTTON_3),
+    ezButton(PIN_BUTTON_4),
+    ezButton(PIN_BUTTON_5),
+    ezButton(PIN_SWITCH_1),
+    ezButton(PIN_SWITCH_2a),
+    ezButton(PIN_SWITCH_2b)
+};
+
+#define BUTTON_NUM 8
+
+#define PIN_CLK 23
+#define PIN_DIN 25
+#define PIN_DC  27
+#define PIN_CE  29
+#define PIN_RST 31
+
+Adafruit_PCD8544 display = Adafruit_PCD8544(PIN_CLK, PIN_DIN, PIN_DC, PIN_CE, PIN_RST);
+
 class Actuators : public Task::Base {
 
 public: 
 actuatorValues_t *_actuatorValues; 
+int diff;
+    
 
 public:
     Actuators(const String& name)
@@ -76,15 +101,25 @@ public:
 
      virtual void begin() override {
 
-        button1.setDebounceTime(50);
-        button2.setDebounceTime(50);
-        button3.setDebounceTime(50);
-        button4.setDebounceTime(50); 
-        button5.setDebounceTime(50);
-
-        switch1.setDebounceTime(50);
-        switch2a.setDebounceTime(50); 
-        switch2b.setDebounceTime(50);
+          for (byte i = 0; i < BUTTON_NUM; i++) {
+            buttonArray[i].setDebounceTime(50); // set debounce time to 50 milliseconds
+  }
+    //    Serial.println("Display begin");
+        display.begin();
+        delay(100);
+        display.clearDisplay(); 
+        display.display();
+        display.setContrast(60);
+        display.display(); // show splashscreen
+        display.setTextSize(2);
+        display.setTextColor(BLACK);
+        display.setCursor(0,0);
+        display.println("Kucky");
+        display.setCursor(10,25);
+        display.println("Copter");
+        display.display();
+        delay(2000);
+        display.clearDisplay();
      }
 
     // optional (you can remove this method)
@@ -101,119 +136,69 @@ public:
         actuatorValues.altitude = analogRead(PIN_ALTITUDE); 
         actuatorValues.altitude_us = analogRead(PIN_ALTITUDE_US);
 
-        Serial.print("Throttle = ");Serial.println(actuatorValues.throttle);
-        Serial.print("yaw = ");Serial.println(actuatorValues.yaw);
-        Serial.print("pitch = ");Serial.println(actuatorValues.pitch);
-        Serial.print("roll = ");Serial.println(actuatorValues.roll);
+        // Serial.print("Throttle = ");Serial.println(actuatorValues.throttle);
+        // Serial.print("yaw = ");Serial.println(actuatorValues.yaw);
+        // Serial.print("pitch = ");Serial.println(actuatorValues.pitch);
+        // Serial.print("roll = ");Serial.println(actuatorValues.roll);
 
-        Serial.print("Altitude = ");Serial.println(actuatorValues.altitude);
-        Serial.print("Altitude_us = ");Serial.println(actuatorValues.altitude_us);
+        // Serial.print("Altitude = ");Serial.println(actuatorValues.altitude);
+        // Serial.print("Altitude_us = ");Serial.println(actuatorValues.altitude_us);
 
-        button1.loop(); 
-        button2.loop(); 
-        button3.loop();
-        button4.loop(); 
-        button5.loop();
+    for (byte i = 0; i < BUTTON_NUM; i++)
+        buttonArray[i].loop(); // MUST call the loop() function first
 
-        switch1.loop(); 
-        switch2a.loop(); 
-        switch2b.loop(); 
-        
-        actuatorValues.btn1State = button1.getState();
-        actuatorValues.btn2State = button2.getState();
-        actuatorValues.btn3State = button3.getState();
-        actuatorValues.btn4State = button4.getState();
-        actuatorValues.btn5State = button5.getState();
+    for (byte i = 0; i < BUTTON_NUM; i++) {
+        if (buttonArray[i].isPressed()) {
+        Serial.print("The button ");
+        Serial.print(i + 1);
+        Serial.println(" is pressed");
+        }
 
-        actuatorValues.swi1State = switch1.getState();
-        actuatorValues.swi2aState = switch2a.getState();
-        actuatorValues.swi2bState = switch2b.getState();
-
-        Serial.print("button 1 state: ");
-        Serial.println(actuatorValues.btn1State);
-        Serial.print("button 2 state: ");
-        Serial.println(actuatorValues.btn2State);
-        Serial.print("button 3 state: ");
-        Serial.println(actuatorValues.btn3State);
-        Serial.print("button 4 state: ");
-        Serial.println(actuatorValues.btn4State);
-        Serial.print("button 5 state: ");
-        Serial.println(actuatorValues.btn5State);
-
-        Serial.print("switch 1 state: ");
-        Serial.println(actuatorValues.swi1State);
-        Serial.print("switch 2a state: ");
-        Serial.println(actuatorValues.swi2aState);
-        Serial.print("switch 2b state: ");
-        Serial.println(actuatorValues.swi2bState);
-        
-
-        if(button1.isPressed())
-            Serial.println("The button 1 is pressed");
-
-        if(button1.isReleased())
-            Serial.println("The button 1 is released");
-
-        if(button2.isPressed())
-            Serial.println("The button 2 is pressed");
-
-        if(button2.isReleased())
-            Serial.println("The button 2 is released");
-
-        if(button3.isPressed())
-            Serial.println("The button 3 is pressed");
-
-        if(button3.isReleased())
-            Serial.println("The button 3 is released");
-
-        if(button4.isPressed())
-            Serial.println("The button 4 is pressed");
-
-        if(button4.isReleased())
-            Serial.println("The button 4 is released");
-
-        if(button5.isPressed())
-            Serial.println("The button 5 is pressed");
-
-        if(button5.isReleased())
-            Serial.println("The button 5 is released");
-
-
-
-        if(switch1.isPressed())
-            Serial.println("The switch 1 is pressed");
-
-        if(switch1.isReleased())
-            Serial.println("The switch 1 is released");   
-
-        if(switch2a.isPressed())
-            Serial.println("The switch 2a is pressed");
-
-        if(switch2a.isReleased())
-            Serial.println("The switch 2a is released");
-
-        if(switch2b.isPressed())
-            Serial.println("The switch 2b is pressed");
-
-        if(switch2b.isReleased())
-            Serial.println("The switch 2b is released");    
-
-
-        actuatorValues.battery = analogRead(PIN_BATTERY);
-        Serial.print("Volt ");Serial.println(actuatorValues.battery);
+        if (buttonArray[i].isReleased()) {
+        Serial.print("The button ");
+        Serial.print(i + 1);
+        Serial.println(" is released");
+        }
     }
 
-    // optional (you can remove this method)
-    // virtual void exit() override {
-    // }
+        display.clearDisplay();
+        display.setTextSize(1);
+        display.setTextColor(BLACK);
+        display.setCursor(0,0);
+        display.println("Throttle: ");
+        display.setCursor(55,0);
+        display.println(actuatorValues.throttle);
 
-    // optional (you can remove this method)
-    // virtual void idle() override {
-    // }
+        display.setCursor(0,10);
+        display.println("Roll    : "); 
+        display.setCursor(55,10);
+        display.println(actuatorValues.roll);
 
-    // optional (you can remove this method)
-    // virtual void reset() override {
-    // }
+        int rollLine = map(actuatorValues.roll, 0, 1023, display.height()-1, 0);
+        
+        Serial.println(rollLine);
+        display.drawLine(0, rollLine, display.width()-1, rollLine, BLACK);
+
+        display.setCursor(0,20);
+        display.println("Pitch   : ");
+        display.setCursor(55,20);
+        display.println(actuatorValues.pitch);
+
+       int pitchLine = map(actuatorValues.pitch, 0, 1023, display.height()-1, 0);
+       Serial.println(pitchLine);
+       display.drawLine(0, pitchLine, display.width()-1, pitchLine, BLACK);
+
+        display.setCursor(0,30);
+        display.println("Yaw     : "); 
+        display.setCursor(55,30);
+        display.println(actuatorValues.yaw);
+
+        display.display();
+
+        // actuatorValues.battery = analogRead(PIN_BATTERY);
+     //    Serial.print("Volt ");Serial.println(actuatorValues.battery);
+    }
+
 };
 
 #endif  // MY_ACTUATORS_H

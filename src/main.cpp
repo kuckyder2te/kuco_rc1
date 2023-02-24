@@ -22,8 +22,7 @@
 #include "..\lib\myLogger.h"
 #include "..\lib\radio.h"
 #include "..\lib\actuators.h"
-#include "..\lib\display.h"
-//#include "..\lib\model.h"
+#include "..\lib\model.h"
 
 #define COM_SPEED 115200
 #define BT_SPEED 115200
@@ -45,7 +44,7 @@ void setup() {
     Logger::setLogLevel(Logger::_DEBUG_); // Muss immer einen Wert in platformio.ini haben (SILENT)
   #endif
 
-  delay(100);
+  delay(1000);
   LOGGER_NOTICE("Program will initialized");
 
   Serial.println("********************************");
@@ -66,7 +65,7 @@ void setup() {
 
   Tasks.add<Radio>("radio")->setModel(&model.RC_interface)->startFps(10);
   Tasks.add<Actuators>("actuators")->setModel(&model.actuatorValues)->startFps(10);
-  Tasks.add<Display>("display")->startFps(10);
+//  Tasks.add<Display>("display")->startFps(10);
 
 }
 
