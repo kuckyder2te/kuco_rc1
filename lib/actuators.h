@@ -10,7 +10,6 @@
 
 //#include "..\lib\model.h"
 
-
 #define PIN_THROTTLE A0
 #define PIN_YAW      A2
 #define PIN_PITCH    A6
@@ -79,8 +78,9 @@ Adafruit_PCD8544 display = Adafruit_PCD8544(PIN_CLK, PIN_DIN, PIN_DC, PIN_CE, PI
 class Actuators : public Task::Base {
 
 public: 
-actuatorValues_t *_actuatorValues; 
-int diff;
+    actuatorValues_t *_actuatorValues; 
+    int diff;
+    int mid = 24;
     
 
 public:
@@ -149,15 +149,17 @@ public:
 
     for (byte i = 0; i < BUTTON_NUM; i++) {
         if (buttonArray[i].isPressed()) {
-        Serial.print("The button ");
-        Serial.print(i + 1);
-        Serial.println(" is pressed");
+            LOGGER_NOTICE_FMT("The button %i ispressed",i+1);
+        // Serial.print("The button ");
+        // Serial.print(i + 1);
+        // Serial.println(" is pressed");
         }
 
         if (buttonArray[i].isReleased()) {
-        Serial.print("The button ");
-        Serial.print(i + 1);
-        Serial.println(" is released");
+            LOGGER_NOTICE_FMT("The button %i released",i+1);
+        // Serial.print("The button ");
+        // Serial.print(i + 1);
+        // Serial.println(" is released");
         }
     }
 
@@ -174,19 +176,21 @@ public:
         display.setCursor(55,10);
         display.println(actuatorValues.roll);
 
-        int rollLine = map(actuatorValues.roll, 0, 1023, display.height()-1, 0);
-        
-        Serial.println(rollLine);
-        display.drawLine(0, rollLine, display.width()-1, rollLine, BLACK);
+        int rollLine = map(actuatorValues.roll, 0, 1023, 0, display.height()-1);
+        diff = rollLine - mid;
+        LOGGER_NOTICE_FMT("Rollline: %i",rollLine);
+        LOGGER_NOTICE_FMT("Diff: %i",diff);
+
+        display.drawLine(0, mid-diff, display.width()-1, mid+diff, BLACK);
 
         display.setCursor(0,20);
         display.println("Pitch   : ");
         display.setCursor(55,20);
         display.println(actuatorValues.pitch);
 
-       int pitchLine = map(actuatorValues.pitch, 0, 1023, display.height()-1, 0);
-       Serial.println(pitchLine);
-       display.drawLine(0, pitchLine, display.width()-1, pitchLine, BLACK);
+        int pitchLine = map(actuatorValues.pitch, 0, 1023, display.height()-1, 0);
+    //   Serial.println(pitchLine);
+        display.drawLine(0, pitchLine, display.width()-1, pitchLine, BLACK);
 
         display.setCursor(0,30);
         display.println("Yaw     : "); 
@@ -196,9 +200,8 @@ public:
         display.display();
 
         // actuatorValues.battery = analogRead(PIN_BATTERY);
-     //    Serial.print("Volt ");Serial.println(actuatorValues.battery);
+        //LOGGER_NOTICE_FMT("Battery has %i Volt",actuatorValues.battery);
     }
-
 };
 
 #endif  // MY_ACTUATORS_H
