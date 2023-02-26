@@ -71,4 +71,6 @@ void setup() {
 
 void loop() {
   Tasks.update();
+
+  model.RC_interface.TX_payload.rcThrottle = model.actuatorValues.throttle;
 }

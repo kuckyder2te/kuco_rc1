@@ -42,7 +42,7 @@ typedef struct {
     int swi1State, swi2aState, swi2bState;
 
 } actuatorValues_t;
-  actuatorValues_t actuatorValues;  
+//  actuatorValues_t actuatorValues;  
 
 ezButton button1(PIN_BUTTON_1);  
 ezButton button2(PIN_BUTTON_2); 
@@ -101,9 +101,9 @@ public:
 
      virtual void begin() override {
 
-          for (byte i = 0; i < BUTTON_NUM; i++) {
+        for (byte i = 0; i < BUTTON_NUM; i++) {
             buttonArray[i].setDebounceTime(50); // set debounce time to 50 milliseconds
-  }
+        }
     //    Serial.println("Display begin");
         display.begin();
         delay(100);
@@ -128,13 +128,13 @@ public:
 
     virtual void update() override {
 
-        actuatorValues.throttle = analogRead(PIN_THROTTLE);
-        actuatorValues.yaw = analogRead(PIN_YAW);
-        actuatorValues.pitch = analogRead(PIN_PITCH);
-        actuatorValues.roll = analogRead(PIN_ROLL);
+        _actuatorValues->throttle = analogRead(PIN_THROTTLE);
+        _actuatorValues->yaw = analogRead(PIN_YAW);
+        _actuatorValues->pitch = analogRead(PIN_PITCH);
+        _actuatorValues->roll = analogRead(PIN_ROLL);
 
-        actuatorValues.altitude = analogRead(PIN_ALTITUDE); 
-        actuatorValues.altitude_us = analogRead(PIN_ALTITUDE_US);
+        _actuatorValues->altitude = analogRead(PIN_ALTITUDE); 
+        _actuatorValues->altitude_us = analogRead(PIN_ALTITUDE_US);
 
         // Serial.print("Throttle = ");Serial.println(actuatorValues.throttle);
         // Serial.print("yaw = ");Serial.println(actuatorValues.yaw);
@@ -169,14 +169,14 @@ public:
         display.setCursor(0,0);
         display.println("Throttle: ");
         display.setCursor(55,0);
-        display.println(actuatorValues.throttle);
+        display.println(_actuatorValues->throttle);
 
         display.setCursor(0,10);
         display.println("Roll    : "); 
         display.setCursor(55,10);
-        display.println(actuatorValues.roll);
+        display.println(_actuatorValues->roll);
 
-        int rollLine = map(actuatorValues.roll, 0, 1023, 0, display.height()-1);
+        int rollLine = map(_actuatorValues->roll, 0, 1023, 0, display.height()-1);
         diff = rollLine - mid;
         LOGGER_NOTICE_FMT("Rollline: %i",rollLine);
         LOGGER_NOTICE_FMT("Diff: %i",diff);
@@ -186,16 +186,16 @@ public:
         display.setCursor(0,20);
         display.println("Pitch   : ");
         display.setCursor(55,20);
-        display.println(actuatorValues.pitch);
+        display.println(_actuatorValues->pitch);
 
-        int pitchLine = map(actuatorValues.pitch, 0, 1023, display.height()-1, 0);
+        int pitchLine = map(_actuatorValues->pitch, 0, 1023, display.height()-1, 0);
     //   Serial.println(pitchLine);
         display.drawLine(0, pitchLine, display.width()-1, pitchLine, BLACK);
 
         display.setCursor(0,30);
         display.println("Yaw     : "); 
         display.setCursor(55,30);
-        display.println(actuatorValues.yaw);
+        display.println(_actuatorValues->yaw);
 
         display.display();
 
