@@ -34,7 +34,8 @@ void localLogger(Logger::Level level, const char* module, const char* message)
       Serial.print(" - ");
     #endif
       Serial.print(F("["));
-      Serial.print(Logger::asString(level));
+      Serial.print((uint8_t)level);
+      //Serial.print(Logger::asString(level));
       Serial.print(F("]:"));
       if (strlen(module) > 0)
       {
@@ -48,7 +49,8 @@ void localLogger(Logger::Level level, const char* module, const char* message)
       Serial2.print(" - ");
     #endif
       Serial2.print(F("["));
-      Serial2.print(Logger::asString(level));
+      Serial2.print((uint8_t)level);
+      //Serial2.print(Logger::asString(level));
       Serial2.print(F("]:"));
       if (strlen(module) > 0)
       {

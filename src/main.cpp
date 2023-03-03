@@ -21,7 +21,7 @@
 
 #include "..\lib\myLogger.h"
 #include "..\lib\radio.h"
-#include "..\lib\actuators.h"
+#include "..\lib\sensors.h"
 #include "..\lib\model.h"
 
 #define COM_SPEED 115200
@@ -64,13 +64,16 @@ void setup() {
   delay(100);
 
   Tasks.add<Radio>("radio")->setModel(&model.RC_interface)->startFps(10);
-  Tasks.add<Actuators>("actuators")->setModel(&model.actuatorValues)->startFps(10);
-//  Tasks.add<Display>("display")->startFps(10);
+  Tasks.add<Sensors>("actuators")->setModel(&model.interfaceSensor)->startFps(10);
 
 }
 
 void loop() {
   Tasks.update();
 
-  model.RC_interface.TX_payload.rcThrottle = model.actuatorValues.throttle;
+  model.RC_interface.TX_payload.rcThrottle = model.interfaceSensor.throttle;
+  model.RC_interface.TX_payload.rcYaw = model.interfaceSensor.yaw;
+  model.RC_interface.TX_payload.rcPitch = model.interfaceSensor.pitch;
+  model.RC_interface.TX_payload.rcRoll = model.interfaceSensor.roll;
+  
 }

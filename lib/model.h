@@ -9,7 +9,7 @@
 // #include "sensors.h"
 // #include "sonic.h"
 #include "radio.h"
-#include "actuators.h"
+#include "sensors.h"
 // #include "performance.h"
 // #include "axisYaw.h"
 // #include "axisMotor.h"
@@ -18,6 +18,6 @@
 
 typedef struct
 {
-    actuatorValues_t actuatorValues;
+    interfaceSensor_t interfaceSensor;
     RC_interface_t RC_interface;
 } model_t;
