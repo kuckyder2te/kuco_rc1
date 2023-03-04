@@ -18,7 +18,7 @@ typedef struct __attribute__((__packed__))
     float rcYaw;
     float rcPitch;
     float rcRoll;
-    bool rcSwi1;     // bool ???
+    bool rcSwi1;
     bool rcSwi2;
     bool rcSwi3;
     float checksum;

@@ -25,9 +25,9 @@
 #define PIN_BUTTON_4 38
 #define PIN_BUTTON_5 A14
 
-#define PIN_SWITCH_1  42
-#define PIN_SWITCH_2a 44
-#define PIN_SWITCH_2b 46
+#define PIN_SWITCH_1 42
+#define PIN_SWITCH_2 44
+#define PIN_SWITCH_3 46
 
 #define PIN_BUZZER   10
 
@@ -40,7 +40,7 @@ typedef struct {
     int battery;
     int altitude, altitude_us;
     int btn1State, btn2State, btn3State, btn4State, btn5State;
-    int swi1State, swi2aState, swi2bState;
+    int swi1State, swi2State, swi3State;
 
 } interfaceSensor_t;
 
@@ -51,8 +51,8 @@ typedef struct {
     ezButton button5(PIN_BUTTON_5); 
 
     ezButton switch1(PIN_SWITCH_1);
-    ezButton switch2a(PIN_SWITCH_2a);
-    ezButton switch2b(PIN_SWITCH_2b);
+    ezButton switch2(PIN_SWITCH_2);
+    ezButton switch3(PIN_SWITCH_3);
 
 ezButton buttonArray[] = {
     ezButton(PIN_BUTTON_1),
@@ -61,8 +61,8 @@ ezButton buttonArray[] = {
     ezButton(PIN_BUTTON_4),
     ezButton(PIN_BUTTON_5),
     ezButton(PIN_SWITCH_1),
-    ezButton(PIN_SWITCH_2a),
-    ezButton(PIN_SWITCH_2b)
+    ezButton(PIN_SWITCH_2),
+    ezButton(PIN_SWITCH_3)
 };
 
 #define BUTTON_NUM 8

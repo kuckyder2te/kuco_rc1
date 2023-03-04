@@ -75,5 +75,8 @@ void loop() {
   model.RC_interface.TX_payload.rcYaw = model.interfaceSensor.yaw;
   model.RC_interface.TX_payload.rcPitch = model.interfaceSensor.pitch;
   model.RC_interface.TX_payload.rcRoll = model.interfaceSensor.roll;
+  model.RC_interface.TX_payload.rcSwi1 = model.interfaceSensor.swi1State;
+  model.RC_interface.TX_payload.rcSwi2 = model.interfaceSensor.swi2State;
+  model.RC_interface.TX_payload.rcSwi3 = model.interfaceSensor.swi3State;
   
 }
