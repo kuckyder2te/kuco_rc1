@@ -18,11 +18,15 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_PCD8544.h>
 #include <TaskManager.h>
+//#include <HardwareSerial.h>
+
+#define SERIAL_STUDIO
 
 #include "..\lib\myLogger.h"
 #include "..\lib\radio.h"
 #include "..\lib\sensors.h"
 #include "..\lib\model.h"
+#include "..\lib\monitor.h"
 
 #define COM_SPEED 115200
 #define BT_SPEED 115200
@@ -65,7 +69,9 @@ void setup() {
 
   Tasks.add<Radio>("radio")->setModel(&model.RC_interface)->startFps(10);
   Tasks.add<Sensors>("actuators")->setModel(&model.interfaceSensor)->startFps(10);
-
+  #ifdef SERIAL_STUDIO
+    Tasks.add<Monitor>("Monitor")->setModel(&model)->startFps(10);
+  #endif
 }
 
 void loop() {

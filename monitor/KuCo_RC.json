@@ -1,0 +1,104 @@
+{
+    "frameEnd": "",
+    "frameStart": "",
+    "groups": [
+        {
+            "datasets": [
+                {
+                    "alarm": 0,
+                    "fft": false,
+                    "fftSamples": 1024,
+                    "graph": true,
+                    "led": false,
+                    "log": false,
+                    "max": 15,
+                    "min": -15,
+                    "title": "Pitch",
+                    "units": "°",
+                    "value": "%3",
+                    "widget": "bar"
+                },
+                {
+                    "alarm": 0,
+                    "fft": false,
+                    "fftSamples": 1024,
+                    "graph": true,
+                    "led": false,
+                    "log": false,
+                    "max": 15,
+                    "min": -15,
+                    "title": "Rol",
+                    "units": "°",
+                    "value": "%4",
+                    "widget": "bar"
+                },
+                {
+                    "alarm": 0,
+                    "fft": false,
+                    "fftSamples": 1024,
+                    "graph": true,
+                    "led": false,
+                    "log": false,
+                    "max": 100,
+                    "min": -100,
+                    "title": "Yaw",
+                    "units": "°/s",
+                    "value": "%2",
+                    "widget": "bar"
+                },
+                {
+                    "alarm": 0,
+                    "fft": false,
+                    "fftSamples": 1024,
+                    "graph": false,
+                    "led": false,
+                    "log": false,
+                    "max": 100,
+                    "min": -100,
+                    "title": "Throttle",
+                    "units": "%",
+                    "value": "%1",
+                    "widget": "bar"
+                }
+            ],
+            "title": "Directions",
+            "widget": ""
+        },
+        {
+            "datasets": [
+                {
+                    "alarm": 50,
+                    "fft": false,
+                    "fftSamples": 1024,
+                    "graph": true,
+                    "led": false,
+                    "log": false,
+                    "max": 50,
+                    "min": 0,
+                    "title": "Baro",
+                    "units": "m",
+                    "value": "%5",
+                    "widget": ""
+                },
+                {
+                    "alarm": 200,
+                    "fft": false,
+                    "fftSamples": 1024,
+                    "graph": true,
+                    "led": false,
+                    "log": false,
+                    "max": 200,
+                    "min": 0,
+                    "title": "US",
+                    "units": "cm",
+                    "value": "%6",
+                    "widget": ""
+                }
+            ],
+            "title": "Altitude",
+            "widget": ""
+        }
+    ],
+    "separator": "",
+    "title": "KuCo_RC"
+}
