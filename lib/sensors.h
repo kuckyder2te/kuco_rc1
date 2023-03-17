@@ -138,16 +138,13 @@ public:
 
     virtual void update() override
     {
-
-        _interfaceSensor->throttle = map((analogRead(PIN_THROTTLE)), 0, 1023, -100, +100);
+        // map is considering +/- 100 %
+        _interfaceSensor->throttle = map((analogRead(PIN_THROTTLE)), 0, 1023, -100, 100);
         _interfaceSensor->yaw = map((analogRead(PIN_YAW)), 0, 1023,-100, 100);
-        _interfaceSensor->pitch = map((analogRead(PIN_PITCH)), 0, 1013, -15, 15); /// max. 15°
-        _interfaceSensor->roll = map((analogRead(PIN_ROLL)), 0, 1013, -15, 15);
-
-        //Serial.print("roll ");Serial.println( _interfaceSensor->roll);
-
-        _interfaceSensor->altitude = map((analogRead(PIN_ALTITUDE)), 0, 1013, 0, 50);      /// max. 50m
-        _interfaceSensor->altitude_us = map(analogRead(PIN_ALTITUDE_US), 0, 1023, 0, 200); /// max. 200cm
+        _interfaceSensor->pitch = map((analogRead(PIN_PITCH)), 0, 1023, -100, 100); // max. 15.0° must be diveded by 10 on Receiver end
+        _interfaceSensor->roll = map((analogRead(PIN_ROLL)), 0, 1023, -100, 100);
+        _interfaceSensor->altitude = map((analogRead(PIN_ALTITUDE)), 0, 1013, 0, 100);
+        _interfaceSensor->altitude_us = map(analogRead(PIN_ALTITUDE_US), 0, 1023, 0, 100);
 
         LOGGER_NOTICE_FMT("Throttle = %i Yaw = %i Pitch = %i Roll = %i", _interfaceSensor->throttle, _interfaceSensor->yaw,
                           _interfaceSensor->pitch, _interfaceSensor->roll);

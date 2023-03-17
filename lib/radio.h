@@ -14,14 +14,16 @@
 
 typedef struct __attribute__((__packed__))
 {
+    float checksum;
+    uint16_t rcYaw;
+    uint8_t rcPitch;
+    uint8_t rcRoll;
     int16_t rcThrottle; //!< Get the positions of the rc joysticks
-    float rcYaw;
-    float rcPitch;
-    float rcRoll;
+    uint16_t rcAltitudeSonicAdj;
+    uint16_t rcAltitudeBaroAdj;
     bool rcSwi1;
     bool rcSwi2;
     bool rcSwi3;
-    float checksum;
 } TX_payload_t;                 // sendet zur Drohne
 
 typedef struct __attribute__((__packed__))
@@ -83,7 +85,7 @@ public:
             {} // hold in infinite loop
         }
 
-        nrf24.setPALevel(RF24_PA_LOW); // RF24_PA_MAX is default.
+        nrf24.setPALevel(RF24_PA_HIGH); // RF24_PA_MAX is default.
         nrf24.enableDynamicPayloads(); // ACK payloads are dynamically sized
         nrf24.enableAckPayload();
         // nrf24.setRetries(15,15);

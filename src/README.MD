@@ -11,5 +11,6 @@
                 Pitch Horizont noch nicht fertig
                 'clearDisplay' was previously declared here
                 void Adafruit_PCD8544::clearDisplay(uint8_t color) ????
-[Change 003]    Monitor implemented and Serial Studio include              
+[Change 003]    Monitor implemented and Serial Studio include 
+[Change 004]    TX- und RX Payload geändert         
                 
