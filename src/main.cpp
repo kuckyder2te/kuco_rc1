@@ -20,16 +20,21 @@
 #include <TaskManager.h>
 //#include <HardwareSerial.h>
 
-#define SERIAL_STUDIO
+//#define SERIAL_STUDIO
 
-#include "..\lib\myLogger.h"
+
 #include "..\lib\radio.h"
 #include "..\lib\sensors.h"
 #include "..\lib\model.h"
 #include "..\lib\monitor.h"
 
+//#define LOCAL_DEBUG
+#include "..\lib\myLogger.h"
+
 #define COM_SPEED 115200
 #define BT_SPEED 115200
+
+#define LED_MAINLOOP 4  //yellow
 
 model_t model;
 
@@ -41,6 +46,18 @@ void setup() {
   Serial2.print(__DATE__);
   Serial2.print(" ");
   Serial2.println(__TIME__);
+
+  pinMode(PIN_RADIO_LED, OUTPUT);
+  digitalWrite(PIN_RADIO_LED, LOW);
+
+  pinMode(LED_MAINLOOP, OUTPUT);
+  digitalWrite(LED_MAINLOOP, LOW);
+
+  pinMode(PIN_BUZZER, OUTPUT);
+  digitalWrite(PIN_BUZZER, LOW);
+
+  pinMode(LED_ALERT, OUTPUT);
+  digitalWrite(LED_ALERT, LOW);
 
   #ifdef _DEBUG_
     Logger::setOutputFunction(&localLogger);
@@ -72,10 +89,13 @@ void setup() {
   #ifdef SERIAL_STUDIO
     Tasks.add<Monitor>("Monitor")->setModel(&model)->startFps(10);
   #endif
+//  Serial.println("setup done");
 }
 
 void loop() {
+//  Serial.println("loop");
   Tasks.update();
+  digitalWrite(LED_MAINLOOP, LOW);
   model.RC_interface.TX_payload.rcThrottle = model.interfaceSensor.throttle;
   model.RC_interface.TX_payload.rcYaw = model.interfaceSensor.yaw;
   model.RC_interface.TX_payload.rcPitch = model.interfaceSensor.pitch;
@@ -85,4 +105,5 @@ void loop() {
   model.RC_interface.TX_payload.rcSwi3 = model.interfaceSensor.swi3State;
   model.RC_interface.TX_payload.rcAltitudeBaroAdj = model.interfaceSensor.altitude;
   model.RC_interface.TX_payload.rcAltitudeSonicAdj = model.interfaceSensor.altitude_us;
+  digitalWrite(LED_MAINLOOP, HIGH);
 }

@@ -6,24 +6,24 @@
 #include <TaskManager.h>
 #include <ezButton.h>
 
-//#define LOCAL_DEBUG
+#define LOCAL_DEBUG
 #include "myLogger.h"
 
 // #include "..\lib\model.h"
 
-#define PIN_THROTTLE A0
-#define PIN_YAW      A2
-#define PIN_PITCH    A6
-#define PIN_ROLL     A4
+#define PIN_THROTTLE A2
+#define PIN_YAW      A0
+#define PIN_PITCH    A4
+#define PIN_ROLL     A6
 
 #define PIN_ALTITUDE    A8
 #define PIN_ALTITUDE_US A10
 
-#define PIN_BUTTON_1 A12
-#define PIN_BUTTON_2 A14
-#define PIN_BUTTON_3 32
-#define PIN_BUTTON_4 34
-#define PIN_BUTTON_5 36
+#define PIN_BUTTON_1 36
+#define PIN_BUTTON_2 32
+#define PIN_BUTTON_3 34
+#define PIN_BUTTON_4 A14
+#define PIN_BUTTON_5 A12
 
 #define PIN_SWITCH_1 38
 #define PIN_SWITCH_2 40
@@ -41,7 +41,6 @@ typedef struct
     int battery;
     int altitude;
     int altitude_us;
-    // int btn1State, btn2State, btn3State, btn4State, btn5State;
     int swi1State, swi2State, swi3State;
 } interfaceSensor_t;
 
@@ -145,11 +144,17 @@ public:
         _interfaceSensor->roll = map((analogRead(PIN_ROLL)), 0, 1023, -100, 100);
         _interfaceSensor->altitude = map((analogRead(PIN_ALTITUDE)), 0, 1013, 0, 100);
         _interfaceSensor->altitude_us = map(analogRead(PIN_ALTITUDE_US), 0, 1023, 0, 100);
+        _interfaceSensor->battery = map(analogRead(PIN_BATTERY), 0, 1023, 0, 100);  
 
         LOGGER_NOTICE_FMT("Throttle = %i Yaw = %i Pitch = %i Roll = %i", _interfaceSensor->throttle, _interfaceSensor->yaw,
                           _interfaceSensor->pitch, _interfaceSensor->roll);
 
-        LOGGER_FATAL_FMT("Altitude = %i Altitude US = %i", _interfaceSensor->altitude, _interfaceSensor->altitude_us);
+        LOGGER_NOTICE_FMT("Altitude = %i Altitude US = %i", _interfaceSensor->altitude, _interfaceSensor->altitude_us);
+
+        LOGGER_NOTICE_FMT("Battery = %i", _interfaceSensor->battery);
+
+     //   alert();
+
 
         for (byte i = 0; i < BUTTON_NUM; i++)
             buttonArray[i].loop(); // MUST call the loop() function first
@@ -228,6 +233,19 @@ public:
         // interfaceSensor.battery = analogRead(PIN_BATTERY);
         // LOGGER_NOTICE_FMT("Battery has %i Volt",interfaceSensor.battery);
     }//---------------------- end of update ------------------------------------------------------//
+
+    void alert(){
+        int lastMillis = millis();
+        if(_interfaceSensor->battery > 50)
+             if(millis()-lastMillis > 1000){
+                 digitalWrite(PIN_BUZZER, HIGH);
+                 lastMillis = millis();
+             }
+             else
+                digitalWrite(PIN_BUZZER, LOW); 
+        else   
+            digitalWrite(PIN_BUZZER, LOW); 
+    }
 };
 
 #endif // MY_SENSORS_H

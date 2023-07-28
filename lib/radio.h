@@ -12,6 +12,9 @@
 #define PIN_CE 48
 #define PIN_CSN 53
 
+#define LED_ALERT    10
+#define PIN_RADIO_LED   1
+
 typedef struct __attribute__((__packed__))
 {
     float checksum;
@@ -32,9 +35,11 @@ typedef struct __attribute__((__packed__))
     float pitch;
     float roll;
     uint16_t altitude;   // Höhe via MS5611  
-    uint16_t sonic;      // US Sensor
+//    uint16_t sonic;      // US Sensor
     float temperature;   // MPU9250
     float pressure;      // MS5611
+    uint16_t distance_down; // US Sensor
+    uint16_t distance_front;  
 } RX_payload_t;                 // empfängt Daten von der Drohne
 
 typedef struct
