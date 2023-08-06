@@ -3,8 +3,8 @@
 
     Date : 2023-02-19
 
-    Description : Drohne
-    Hardware : MEGA 2560
+    Description : Drohne remote
+    Hardware : Arduino MEGA2560 Mini
                Display : Nokia 5110
               
 */
@@ -24,7 +24,7 @@
 
 
 #include "..\lib\radio.h"
-#include "..\lib\sensors.h"
+#include "..\lib\Controller.h"
 #include "..\lib\model.h"
 #include "..\lib\monitor.h"
 
@@ -32,7 +32,7 @@
 #include "..\lib\myLogger.h"
 
 #define COM_SPEED 115200
-#define BT_SPEED 115200
+#define BT_SPEED  115200
 
 #define LED_MAINLOOP 4  //yellow
 
@@ -85,7 +85,7 @@ void main_setup() {
   delay(100);
 
   Tasks.add<Radio>("radio")->setModel(&model.RC_interface)->startFps(10);
-  Tasks.add<Sensors>("actuators")->setModel(&model.interfaceSensor)->startFps(10);
+  Tasks.add<Controller>("actuators")->setModel(&model.interfaceController)->startFps(10);
   #ifdef SERIAL_STUDIO
     Tasks.add<Monitor>("Monitor")->setModel(&model)->startFps(10);
   #endif
@@ -97,20 +97,36 @@ void main_loop() {
   static unsigned long _lastMillis = millis();
   Tasks.update();
   digitalWrite(LED_MAINLOOP, LOW);
-  model.RC_interface.TX_payload.rcThrottle = model.interfaceSensor.throttle;
-  model.RC_interface.TX_payload.rcYaw = model.interfaceSensor.yaw;
-  model.RC_interface.TX_payload.rcPitch = model.interfaceSensor.pitch;
-  model.RC_interface.TX_payload.rcRoll = model.interfaceSensor.roll;
-  model.RC_interface.TX_payload.rcSwi1 = model.interfaceSensor.swi1State;
-  model.RC_interface.TX_payload.rcSwi2 = model.interfaceSensor.swi2State;
-  model.RC_interface.TX_payload.rcSwi3 = model.interfaceSensor.swi3State;
-  model.RC_interface.TX_payload.rcAltitudeBaroAdj = model.interfaceSensor.altitude;
-  model.RC_interface.TX_payload.rcAltitudeSonicAdj = model.interfaceSensor.altitude_us;
-  if(millis()-_lastMillis > 1000){
-    _lastMillis = millis();
-    LOGGER_NOTICE_FMT("Temp: %i",(uint16_t)model.RC_interface.RX_payload.temperature);
-    Serial.println(model.RC_interface.RX_payload.temperature);
-  }
+
+    model.RC_interface.TX_payload.rcThrottle = model.interfaceController.throttle;
+    model.RC_interface.TX_payload.rcYaw = model.interfaceController.yaw;
+    model.RC_interface.TX_payload.rcPitch = model.interfaceController.pitch;
+    model.RC_interface.TX_payload.rcRoll = model.interfaceController.roll;
+    model.RC_interface.TX_payload.rcSwi1 = model.interfaceController.swi1State;
+    model.RC_interface.TX_payload.rcSwi2 = model.interfaceController.swi2State;
+    model.RC_interface.TX_payload.rcSwi3 = model.interfaceController.swi3State;
+    model.RC_interface.TX_payload.rcAltitudeBaroAdj = model.interfaceController.altitude;
+    model.RC_interface.TX_payload.rcAltitudeSonicAdj = model.interfaceController.altitude_down;
+    if(millis()-_lastMillis > 1000){
+      _lastMillis = millis();
+
+      LOGGER_NOTICE_FMT("Throttle = %i Yaw = %i Pitch = %i Roll %i,",(uint16_t)model.interfaceController.throttle,
+                                                                     (uint16_t)model.RC_interface.RX_payload.yaw,
+                                                                     (uint16_t)model.RC_interface.RX_payload.pitch,
+                                                                     (uint16_t)model.RC_interface.RX_payload.roll);
+
+      LOGGER_NOTICE_FMT("Swi 1 = %i Swi2 = %i Swi3 = %i,",(uint16_t)model.interfaceController.swi1State,
+                                                          (uint16_t)model.interfaceController.swi2State,
+                                                          (uint16_t)model.interfaceController.swi3State);
+
+      LOGGER_NOTICE_FMT("Altitude = %i Ground = %i Front = %i,",(uint16_t)model.RC_interface.RX_payload.altitude,
+                                                                (uint16_t)model.RC_interface.RX_payload.distance_down,
+                                                                (uint16_t)model.RC_interface.RX_payload.distance_front);                                                          
+                                                                    
+
+      LOGGER_NOTICE_FMT("Temp: %i",(uint16_t)model.RC_interface.RX_payload.temperature);
+      Serial.println(model.RC_interface.RX_payload.temperature);
+    }
   
   digitalWrite(LED_MAINLOOP, HIGH);
 }

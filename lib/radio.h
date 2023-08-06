@@ -13,16 +13,16 @@
 #define PIN_CE 49
 #define PIN_CSN 53
 
-#define LED_ALERT    10
+#define LED_ALERT       10
 #define PIN_RADIO_LED   1
 
 typedef struct __attribute__((__packed__))
 {
     float checksum;
-    uint16_t rcYaw;
+    uint16_t rcYaw;       //!< Get the positions of the rc joysticks
     uint8_t rcPitch;
     uint8_t rcRoll;
-    int16_t rcThrottle; //!< Get the positions of the rc joysticks
+    int16_t rcThrottle; 
     uint16_t rcAltitudeSonicAdj;
     uint16_t rcAltitudeBaroAdj;
     bool rcSwi1;
@@ -32,16 +32,15 @@ typedef struct __attribute__((__packed__))
 
 typedef struct __attribute__((__packed__))
 {
-    float yaw;          // Fluglage via MPU9250
+    float yaw;                // Fluglage MPU9250
     float pitch;
     float roll;
-    uint16_t altitude;   // Höhe via MS5611  
-//    uint16_t sonic;      // US Sensor
-    float temperature;   // MPU9250
-    float pressure;      // MS5611
-    uint16_t distance_down; // US Sensor
-    uint16_t distance_front;  
-} RX_payload_t;                 // empfängt Daten von der Drohne
+    uint16_t altitude;        // MS5611  
+    float temperature;        // MPU9250
+    float pressure;           // MS5611
+    uint16_t distance_down;   // US Sensor looks down
+    uint16_t distance_front;  // US Sensor looks ahead
+} RX_payload_t;               // empfängt Daten von der Drohne
 
 typedef struct
 {
@@ -98,7 +97,7 @@ public:
     virtual void update() override {
     RC_interface->isconnect = _radio->write(&RC_interface->TX_payload, sizeof(TX_payload_t));  // transmit & save the report
     if (RC_interface->isconnect) {
-        #ifndef SERIAL_STUDIO
+        //#ifndef SERIAL_STUDIO
             LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcThrottle,debugTX_payload.rcThrottle,"Throttle = %i", RC_interface->TX_payload.rcThrottle);
             LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcYaw,debugTX_payload.rcYaw,"Yaw = %i", RC_interface->TX_payload.rcYaw);
             LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcPitch,debugTX_payload.rcPitch,"Pitch = %i", RC_interface->TX_payload.rcPitch);
@@ -106,26 +105,26 @@ public:
             LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi1,debugTX_payload.rcSwi1,"Swi 1 = %i", RC_interface->TX_payload.rcSwi1);
             LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi2,debugTX_payload.rcSwi2,"Swi 2 = %i", RC_interface->TX_payload.rcSwi2);
             LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi3,debugTX_payload.rcSwi3,"Swi 3 = %i", RC_interface->TX_payload.rcSwi3);
-        #endif
+            LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi3,debugTX_payload.rcAltitudeBaroAdj,"Adjus Hoehe = %i", RC_interface->TX_payload.);
+            LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi3,debugTX_payload.rcAltitudeSonicAdj,"Adjust Ground = %i", RC_interface->TX_payload.rcAltitudeSonicAdj);
+        //#endif
         if (_radio->available()) {  // is there an ACK payload? grab the pipe number that received it
           _radio->read(&RC_interface->RX_payload, sizeof(RX_payload_t));  // get incoming ACK payload
-          #ifndef SERIAL_STUDIO
+        //  #ifndef SERIAL_STUDIO
             LOGGER_NOTICE_FMT_CHK(RC_interface->RX_payload.yaw,debugRX_payload.yaw,"Received Yaw = %i",RC_interface->RX_payload.yaw);
             LOGGER_NOTICE_FMT_CHK(RC_interface->RX_payload.pitch,debugRX_payload.pitch,"Received Pitch = %i",RC_interface->RX_payload.pitch);
-            LOGGER_NOTICE_FMT_CHK(RC_interface->RX_payload.sonic,debugRX_payload.sonic,"Received Roll = %i",RC_interface->RX_payload.roll);
+            LOGGER_NOTICE_FMT_CHK(RC_interface->RX_payload.sonic,debugRX_payload.roll,"Received Roll = %i",RC_interface->RX_payload.roll);
             LOGGER_NOTICE_FMT_CHK(RC_interface->RX_payload.sonic,debugRX_payload.temperature,"Received temperature = %i *C",RC_interface->RX_payload.temperature);
             LOGGER_NOTICE_FMT_CHK(RC_interface->RX_payload.sonic,debugRX_payload.pressure,"Received pressure = %i hP",RC_interface->RX_payload.pressure);
             LOGGER_NOTICE_FMT_CHK(RC_interface->RX_payload.altitude,debugRX_payload.altitude,"Received Sonic = %i cm",RC_interface->RX_payload.altitude);
             LOGGER_NOTICE_FMT_CHK(RC_interface->RX_payload.sonic,debugRX_payload.sonic,"Received Altitude = %i m",RC_interface->RX_payload.sonic);
-          #endif
+         // #endif
         } else {
           LOGGER_FATAL("Recieved: an empty ACK packet");
         }
       } else {
         LOGGER_FATAL("Transmission failed or timed out");  // payload was not delivered  // payload was not delivered
-      }
-    //delay(100);  // slow transmissions down by 1 second      
+      }    
     }//---------------------- end of update ------------------------------------------------------//
 };
-
 #endif  // MY_RADIO_H
