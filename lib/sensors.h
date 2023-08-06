@@ -6,7 +6,7 @@
 #include <TaskManager.h>
 #include <ezButton.h>
 
-#define LOCAL_DEBUG
+//#define LOCAL_DEBUG
 #include "myLogger.h"
 
 // #include "..\lib\model.h"

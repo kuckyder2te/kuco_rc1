@@ -30,7 +30,6 @@ public:
 
     virtual ~Monitor() {}
 
-
     Monitor *setModel(model_t *_mod)
     { // Rückgabe wert ist das eigene Objekt (this)
         LOGGER_VERBOSE("Enter....");
@@ -39,19 +38,10 @@ public:
         return this;
     } /*--------------------- end of setModel -----------------------------------------*/
 
-
-    // optional (you can remove this method)
     // virtual void begin() override {
     // }
 
     virtual void update() override {
-    /*
-    IMU-> Yaw,Pitch,Roll
-    Sonic-> Distance
-    Radio-> 
-    Baro->
-    Motor
-    */
 
         sprintf(strBuf, "/*%i, %i, %i, %i, %i, %i*/\r\n",
             _model->interfaceSensor.throttle,

@@ -3,13 +3,14 @@
 #define MY_RADIO_H
 
 #include <TaskManager.h>
+#include <SPI.h>
 #include <RF24.h>
 #include <../lib/myLogger.h>
 
 //#define LOCAL_DEBUG
 #include "myLogger.h"
 
-#define PIN_CE 48
+#define PIN_CE 49
 #define PIN_CSN 53
 
 #define LED_ALERT    10
@@ -48,16 +49,11 @@ typedef struct
     RX_payload_t RX_payload; 
     TX_payload_t TX_payload;
 } RC_interface_t;
-
-RF24 nrf24(PIN_CE, PIN_CSN);
-
 class Radio : public Task::Base {
 
-    const uint64_t pipe_RX = 0xF0F0F0F0E1LL;
-    const uint64_t pipe_TX = 0xF0F0F0F0D2LL;
-
-
-    unsigned long _lastReceivedPacket;
+  const uint64_t pipe_RX = 0xF0F0F0E1L;
+  const uint64_t pipe_TX = 0xF0F0F0D2L;
+  unsigned long _lastReceivedPacket;
 
 protected:
     RF24 *_radio; 
@@ -81,27 +77,26 @@ public:
     }
 
     virtual void begin() override {
-
-        nrf24.begin(); ///< optionally, increase the delay between retries & # of retries
-        if (!nrf24.begin())
+        _radio = new RF24(PIN_CE, PIN_CSN);
+        if (!_radio->begin())
         {
             LOGGER_FATAL("radio hardware is not responding!!");
             while (1)
             {} // hold in infinite loop
         }
 
-        nrf24.setPALevel(RF24_PA_HIGH); // RF24_PA_MAX is default.
-        nrf24.enableDynamicPayloads(); // ACK payloads are dynamically sized
-        nrf24.enableAckPayload();
+        _radio->setPALevel(RF24_PA_LOW); // RF24_PA_MAX is default.
+        _radio->enableDynamicPayloads(); // ACK payloads are dynamically sized
+        _radio->enableAckPayload();
         // nrf24.setRetries(15,15);
-        nrf24.setPayloadSize(sizeof(TX_payload_t));	///< optionally, reduce the payload size. seems to improve reliability
-        nrf24.openWritingPipe(pipe_TX);
-        nrf24.openReadingPipe(1, pipe_RX);
-        nrf24.stopListening();                 // put radio in TX mode
+        //_radio->setPayloadSize(sizeof(TX_payload_t));	///< optionally, reduce the payload size. seems to improve reliability
+        _radio->openWritingPipe(pipe_TX);
+        _radio->openReadingPipe(1, pipe_RX);
+        _radio->stopListening();                 // put radio in TX mode
     }//---------------------- end of begin ------------------------------------------------------//
 
     virtual void update() override {
-    RC_interface->isconnect = nrf24.write(&RC_interface->TX_payload, sizeof(TX_payload_t));  // transmit & save the report
+    RC_interface->isconnect = _radio->write(&RC_interface->TX_payload, sizeof(TX_payload_t));  // transmit & save the report
     if (RC_interface->isconnect) {
         #ifndef SERIAL_STUDIO
             LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcThrottle,debugTX_payload.rcThrottle,"Throttle = %i", RC_interface->TX_payload.rcThrottle);
@@ -112,8 +107,8 @@ public:
             LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi2,debugTX_payload.rcSwi2,"Swi 2 = %i", RC_interface->TX_payload.rcSwi2);
             LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi3,debugTX_payload.rcSwi3,"Swi 3 = %i", RC_interface->TX_payload.rcSwi3);
         #endif
-        if (nrf24.available()) {  // is there an ACK payload? grab the pipe number that received it
-          nrf24.read(&RC_interface->RX_payload, sizeof(RX_payload_t));  // get incoming ACK payload
+        if (_radio->available()) {  // is there an ACK payload? grab the pipe number that received it
+          _radio->read(&RC_interface->RX_payload, sizeof(RX_payload_t));  // get incoming ACK payload
           #ifndef SERIAL_STUDIO
             LOGGER_NOTICE_FMT_CHK(RC_interface->RX_payload.yaw,debugRX_payload.yaw,"Received Yaw = %i",RC_interface->RX_payload.yaw);
             LOGGER_NOTICE_FMT_CHK(RC_interface->RX_payload.pitch,debugRX_payload.pitch,"Received Pitch = %i",RC_interface->RX_payload.pitch);

@@ -28,7 +28,7 @@
 #include "..\lib\model.h"
 #include "..\lib\monitor.h"
 
-//#define LOCAL_DEBUG
+#define LOCAL_DEBUG
 #include "..\lib\myLogger.h"
 
 #define COM_SPEED 115200
@@ -38,7 +38,7 @@
 
 model_t model;
 
-void setup() {
+void main_setup() {
   Serial.begin(COM_SPEED);
   Serial2.begin(BT_SPEED);
   Serial.println("Serial COM OK");
@@ -92,8 +92,9 @@ void setup() {
 //  Serial.println("setup done");
 }
 
-void loop() {
+void main_loop() {
 //  Serial.println("loop");
+  static unsigned long _lastMillis = millis();
   Tasks.update();
   digitalWrite(LED_MAINLOOP, LOW);
   model.RC_interface.TX_payload.rcThrottle = model.interfaceSensor.throttle;
@@ -105,5 +106,19 @@ void loop() {
   model.RC_interface.TX_payload.rcSwi3 = model.interfaceSensor.swi3State;
   model.RC_interface.TX_payload.rcAltitudeBaroAdj = model.interfaceSensor.altitude;
   model.RC_interface.TX_payload.rcAltitudeSonicAdj = model.interfaceSensor.altitude_us;
+  if(millis()-_lastMillis > 1000){
+    _lastMillis = millis();
+    LOGGER_NOTICE_FMT("Temp: %i",(uint16_t)model.RC_interface.RX_payload.temperature);
+    Serial.println(model.RC_interface.RX_payload.temperature);
+  }
+  
   digitalWrite(LED_MAINLOOP, HIGH);
+}
+
+void setup(){
+  main_setup();
+}
+
+void loop(){
+  main_loop();
 }
