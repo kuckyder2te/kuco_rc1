@@ -28,7 +28,7 @@
 #include "..\lib\model.h"
 #include "..\lib\monitor.h"
 
-#define LOCAL_DEBUG
+//#define LOCAL_DEBUG
 #include "..\lib\myLogger.h"
 
 #define COM_SPEED 115200
@@ -50,7 +50,7 @@ void main_setup() {
   pinMode(PIN_RADIO_LED, OUTPUT);
   digitalWrite(PIN_RADIO_LED, LOW);
 
-  pinMode(LED_MAINLOOP, OUTPUT);
+  pinMode(LED_MAINLOOP, OUTPUT);      // Yellow
   digitalWrite(LED_MAINLOOP, LOW);
 
   pinMode(PIN_BUZZER, OUTPUT);
@@ -86,10 +86,10 @@ void main_setup() {
 
   Tasks.add<Radio>("radio")->setModel(&model.RC_interface)->startFps(10);
   Tasks.add<Controller>("actuators")->setModel(&model.interfaceController)->startFps(10);
-  #ifdef SERIAL_STUDIO
-    Tasks.add<Monitor>("Monitor")->setModel(&model)->startFps(10);
-  #endif
-//  Serial.println("setup done");
+  //#ifdef SERIAL_STUDIO
+  Tasks.add<Monitor>("Monitor")->setModel(&model)->startFps(10);
+  //#endif
+  Serial.println("setup done");
 }
 
 void main_loop() {
@@ -111,9 +111,9 @@ void main_loop() {
       _lastMillis = millis();
 
       LOGGER_NOTICE_FMT("Throttle = %i Yaw = %i Pitch = %i Roll %i,",(uint16_t)model.interfaceController.throttle,
-                                                                     (uint16_t)model.RC_interface.RX_payload.yaw,
-                                                                     (uint16_t)model.RC_interface.RX_payload.pitch,
-                                                                     (uint16_t)model.RC_interface.RX_payload.roll);
+                                                                     (uint16_t)model.interfaceController.yaw,
+                                                                     (uint16_t)model.interfaceController.pitch,
+                                                                     (uint16_t)model.interfaceController.roll);
 
       LOGGER_NOTICE_FMT("Swi 1 = %i Swi2 = %i Swi3 = %i,",(uint16_t)model.interfaceController.swi1State,
                                                           (uint16_t)model.interfaceController.swi2State,
@@ -124,8 +124,8 @@ void main_loop() {
                                                                 (uint16_t)model.RC_interface.RX_payload.distance_front);                                                          
                                                                     
 
-      LOGGER_NOTICE_FMT("Temp: %i",(uint16_t)model.RC_interface.RX_payload.temperature);
-      Serial.println(model.RC_interface.RX_payload.temperature);
+      // LOGGER_NOTICE_FMT("Temp: %i",(uint16_t)model.RC_interface.RX_payload.temperature);
+      // Serial.println(model.RC_interface.RX_payload.temperature);
     }
   
   digitalWrite(LED_MAINLOOP, HIGH);

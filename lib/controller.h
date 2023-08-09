@@ -6,7 +6,7 @@
 #include <TaskManager.h>
 #include <ezButton.h>
 
-//#define LOCAL_DEBUG
+#define LOCAL_DEBUG
 #include "myLogger.h"
 
 // #include "..\lib\model.h"
@@ -29,13 +29,7 @@
 #define PIN_SWITCH_2 40
 #define PIN_SWITCH_3 42
 #define PIN_SWITCH_4 44
-#define PIN_SWITCH_5 46
-
-#define NOKIA_CLK   23
-#define NOKIA_DIN   25
-#define NOKIA_DC    27
-#define NOKIA_CS    29
-#define NOKIA_RST   31
+//#define PIN_SWITCH_5 46
 
 #define PIN_BUZZER 10
 
@@ -47,7 +41,7 @@ typedef struct
     int battery;
     int altitude;
     int altitude_down ;
-    int swi1State, swi2State, swi3State;
+    int swi1State, swi2State, swi3State, swi4State;
 } interfaceController_t;
 
 ezButton button1(PIN_BUTTON_1);
@@ -60,7 +54,6 @@ ezButton switch1(PIN_SWITCH_1);
 ezButton switch2(PIN_SWITCH_2);
 ezButton switch3(PIN_SWITCH_3);
 ezButton switch4(PIN_SWITCH_4);
-ezButton switch5(PIN_SWITCH_5);
 
 ezButton buttonArray[] = {
     ezButton(PIN_BUTTON_1),
@@ -73,27 +66,15 @@ ezButton switchArray[] = {
     ezButton(PIN_SWITCH_1),
     ezButton(PIN_SWITCH_2),
     ezButton(PIN_SWITCH_3),
-    ezButton(PIN_SWITCH_4),
-    ezButton(PIN_SWITCH_5)};
+    ezButton(PIN_SWITCH_4)};
 
 #define BUTTON_NUM 5
-#define SWITCH_NUM 5
-
-// #define PIN_CLK 23
-// #define PIN_DIN 25
-// #define PIN_DC  27
-// #define PIN_CE_NOKIA  29 
-// #define PIN_RST 31
-
-// Adafruit_PCD8544 display = Adafruit_PCD8544(NOKIA_CLK, NOKIA_DIN, NOKIA_DC, NOKIA_CS, NOKIA_RST);
-
+#define SWITCH_NUM 4
 class Controller : public Task::Base
 {
 
 private:
     interfaceController_t *_interfaceController;
-    // int diff;
-    // int mid = 24;
 
 public:
     Controller(const String &name)
@@ -122,6 +103,7 @@ public:
         for (byte i = 0; i < SWITCH_NUM; i++)
         {
             switchArray[i].setDebounceTime(50); // set debounce time to 50 milliseconds
+
         }
 
         // display.begin();
@@ -143,6 +125,7 @@ public:
 
     virtual void update() override
     {
+        Serial.println("update");
         // map is considering +/- 100 %
         _interfaceController->throttle = map((analogRead(PIN_THROTTLE)), 0, 1023, -100, 100);
         _interfaceController->yaw = map((analogRead(PIN_YAW)), 0, 1023,-100, 100);
@@ -155,13 +138,13 @@ public:
         LOGGER_NOTICE_FMT("Throttle = %i Yaw = %i Pitch = %i Roll = %i", _interfaceController->throttle, _interfaceController->yaw,
                           _interfaceController->pitch, _interfaceController->roll);
 
-        LOGGER_NOTICE_FMT("Altitude = %i Altitude US = %i", _interfaceController->altitude, _interfaceController->altitude_down);
+        // LOGGER_NOTICE_FMT("Altitude = %i Altitude US = %i", _interfaceController->altitude, _interfaceController->altitude_down);
 
-        LOGGER_NOTICE_FMT("Battery = %i", _interfaceController->battery);
+        // LOGGER_NOTICE_FMT("Battery = %i", _interfaceController->battery);
 
      //   alert();
 
-
+        
         for (byte i = 0; i < BUTTON_NUM; i++)
             buttonArray[i].loop(); // MUST call the loop() function first
 
@@ -181,11 +164,22 @@ public:
         for (byte i = 0; i < SWITCH_NUM; i++)
             switchArray[i].loop(); // MUST call the loop() function first
 
+        // _interfaceController->swi1State = switchArray[0].getState();
+        //     LOGGER_NOTICE_FMT("The switch1 state is %i ", _interfaceController->swi1State);
+        // _interfaceController->swi2State = switchArray[1].getState();
+        //     LOGGER_NOTICE_FMT("The switch2 state is %i ", _interfaceController->swi2State);
+        // _interfaceController->swi3State = switchArray[2].getState();
+        //     LOGGER_NOTICE_FMT("The switch3 state is %i ", _interfaceController->swi3State);
+        // _interfaceController->swi4State = switchArray[3].getState();
+        //     LOGGER_NOTICE_FMT("The switch4 state is %i ", _interfaceController->swi4State);
+        // _interfaceController->swi5State = switchArray[4].getState();
+        //     LOGGER_NOTICE_FMT("The switch5 state is %i ", _interfaceController->swi5State);
+
         for (byte i = 0; i < SWITCH_NUM; i++)
         {
             if (switchArray[i].isPressed())
             {
-                LOGGER_NOTICE_FMT("The switch %i ispressed", i + 1);
+                LOGGER_NOTICE_FMT("The switch %i ispressed", i + 1);           
             }
 
             if (switchArray[i].isReleased())
@@ -193,51 +187,8 @@ public:
                 LOGGER_NOTICE_FMT("The switch %i released", i + 1);
             }
         }
-
-    //     display.clearDisplay();
-    //     display.setTextSize(1);
-    //     display.setTextColor(BLACK);
-    //     display.setCursor(0, 0);
-    //     display.println("Throttle: ");
-    //     display.setCursor(55, 0);
-    //     display.println(_interfaceController->throttle);
-
-    //     display.setCursor(0, 10);
-    //     display.println("Roll    : ");
-    //     display.setCursor(55, 10);
-    //     display.println(_interfaceController->roll);
-    //     int rollLine = map(_interfaceController->roll, -15, +15, 0, display.height() - 1);
-    //    // Serial.print("rollLine ");Serial.println(rollLine);
-
-    //     diff = rollLine-mid;
-    //    // Serial.print("diff ");Serial.println(diff);
-    //     //display.drawLine(0, 0, display.width() - 1, 47, BLACK);
-    //     display.drawLine(0, rollLine + diff, display.width() - 1, rollLine - diff, BLACK);
-    //     //Serial.print("rollLine+diff ");Serial.println(rollLine+diff);
-    //     // Serial.print("rollLine-diff ");Serial.println(rollLine-diff);
-
-    //     display.setCursor(0, 20);
-    //     display.println("Pitch   : ");
-    //     display.setCursor(55, 20);
-    //     display.println(_interfaceController->pitch);
-    //     int pitchLine = map(_interfaceController->pitch, -15, 15, display.height() - 1, 0);
-    //     // Serial.print("pitchLine ");Serial.println(_interfaceController->pitch);
-    //     display.drawLine(0, pitchLine, display.width() - 1, pitchLine, BLACK);
-
-    //     display.setCursor(0, 30);
-    //     display.println("Yaw     : ");
-    //     display.setCursor(55, 30);
-    //     display.println(_interfaceController->yaw);
-
-    //     display.setCursor(0, 40);
-    //     display.print("Mode ");
-    //     display.setCursor(55, 40);
-    //     display.println(_interfaceController->swi1State);
-
-    //     display.display();
-
-        // interfaceSensor.battery = analogRead(PIN_BATTERY);
-        // LOGGER_NOTICE_FMT("Battery has %i Volt",interfaceSensor.battery);
+        // _interfaceController.battery = analogRead(PIN_BATTERY);
+        // LOGGER_NOTICE_FMT("Battery has %i Volt",_interfaceController.battery);
     }//---------------------- end of update ------------------------------------------------------//
 
     void alert(){
