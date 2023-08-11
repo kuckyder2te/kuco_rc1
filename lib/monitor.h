@@ -1,11 +1,11 @@
 #pragma once
-/*  File name : 
+/*  File name :
     Project name : KuCo_Phantom 1
     Author: Wilhelm Kuckelsberg
     Date : 2022-
 
     Description : Drohne
- 
+
 */
 
 #include <Arduino.h>
@@ -18,11 +18,11 @@
 //#define LOCAL_DEBUG
 #include "myLogger.h"
 
- //#define TEST
+#define TEST
 
- //Adafruit_PCD8544 display = Adafruit_PCD8544(PIN_NOKIA_CLK, PIN_NOKIA_DIN, PIN_NOKIA_DC, PIN_NOKIA_CS, PIN_NOKIA_RST);
+// Adafruit_PCD8544 display = Adafruit_PCD8544(PIN_NOKIA_CLK, PIN_NOKIA_DIN, PIN_NOKIA_DC, PIN_NOKIA_CS, PIN_NOKIA_RST);
 
-// static const unsigned char PROGMEM KuCo_logo[] = 
+// static const unsigned char PROGMEM KuCo_logo[] =
 // {
 // 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 // 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -55,49 +55,63 @@
 // 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x03, 0x07, 0x07, 0x07,
 // 0x07, 0x07, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 // 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x70, 0x7E, 0x07,
-// 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+// 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 // };
 
-static const unsigned char PROGMEM KuCo_logo[] =
-{ 0B00000000, 0B11000000,
-  0B00000001, 0B11000000,
-  0B00000001, 0B11000000,
-  0B00000011, 0B11100000,
-  0B11110011, 0B11100000,
-  0B11111110, 0B11111000,
-  0B01111110, 0B11111111,
-  0B00110011, 0B10011111,
-  0B00011111, 0B11111100,
-  0B00001101, 0B01110000,
-  0B00011011, 0B10100000,
-  0B00111111, 0B11100000,
-  0B00111111, 0B11110000,
-  0B01111100, 0B11110000,
-  0B01110000, 0B01110000,
-  0B00000000, 0B00110000 };
+// static const unsigned char PROGMEM KuCo_logo[] =
+// { 0B00000000, 0B11000000,
+//   0B00000001, 0B11000000,
+//   0B00000001, 0B11000000,
+//   0B00000011, 0B11100000,
+//   0B11110011, 0B11100000,
+//   0B11111110, 0B11111000,
+//   0B01111110, 0B11111111,
+//   0B00110011, 0B10011111,
+//   0B00011111, 0B11111100,
+//   0B00001101, 0B01110000,
+//   0B00011011, 0B10100000,
+//   0B00111111, 0B11100000,
+//   0B00111111, 0B11110000,
+//   0B01111100, 0B11110000,
+//   0B01110000, 0B01110000,
+//   0B00000000, 0B00110000 };
 
 char strBuf[100];
 
-#define PIN_NOKIA_CLK   23
-#define PIN_NOKIA_DIN   25
-#define PIN_NOKIA_DC    27
-#define PIN_NOKIA_CS    29
-#define PIN_NOKIA_RST   31
+#define PIN_NOKIA_CLK 23
+#define PIN_NOKIA_DIN 25
+#define PIN_NOKIA_DC 27
+#define PIN_NOKIA_CS 29
+#define PIN_NOKIA_RST 31
 
-class Monitor : public Task::Base {
+#define DISPLAY_DELAY 1000
+
+typedef enum
+{
+    RADIO,
+    CONTROLLER,
+    DEFAULTS
+} Report_t;
+
+class Monitor : public Task::Base
+{
 
 protected:
-    Adafruit_PCD8544* _nokia;
+    Adafruit_PCD8544 *_nokia;
 
 private:
     model_t *_model;
+    unsigned long _lastMillis;
+    uint16_t _display_delay;
+    Report_t _report;
 
 public:
-    Monitor(const String& name)
-    : Task::Base(name) {
-    }
-
-    virtual ~Monitor() {}
+    Monitor(const String &name, Report_t report = Report_t::DEFAULTS, uint16_t delay = DISPLAY_DELAY)
+        : Task::Base(name) {
+            _lastMillis = millis();
+            _report = report;
+            _display_delay = delay;
+        }
 
     Monitor *setModel(model_t *_mod)
     { // Rückgabe wert ist das eigene Objekt (this)
@@ -107,20 +121,21 @@ public:
         return this;
     } /*--------------------- end of setModel -----------------------------------------*/
 
-     virtual void begin() override {
+    virtual void begin() override
+    {
 
         Serial.println("Monitor begin");
 
         _nokia = new Adafruit_PCD8544(PIN_NOKIA_CLK, PIN_NOKIA_DIN, PIN_NOKIA_DC, PIN_NOKIA_CS, PIN_NOKIA_RST);
-        
+
         _nokia->begin();
         _nokia->setContrast(60);
         _nokia->display();
         delay(100);
         _nokia->clearDisplay();
-         _nokia->drawBitmap(0, 0, KuCo_logo, 16, 16, 1);
-         _nokia->display();
-        
+        //     _nokia->drawBitmap(0, 0, KuCo_logo, 16, 16, 1);
+        _nokia->display();
+
         _nokia->display();
         _nokia->setTextSize(2);
         _nokia->setTextColor(BLACK);
@@ -131,62 +146,88 @@ public:
         _nokia->display();
         delay(2000);
         _nokia->clearDisplay();
-     }/*--------------------- end of begin -----------------------------------------*/
+        Serial.println("******** Channel description *******");
+        switch(_report){
+            case RADIO:
+                Serial.println("yaw,pitch,roll,altitude,distance_down,distance_front,pressure,temperature,battery,isconnected");
+            break;
+            default:
+                Serial.println("Please add Channel descriptin in monitor.begin()");
+            break;
+        }
+        Serial.println("********************************");
 
-    virtual void update() override {
-     //   Serial.println("update");
+    } /*--------------------- end of begin -----------------------------------------*/
 
-        #ifdef TEST
+    virtual void update() override
+    {
+        if (millis() - _lastMillis > _display_delay)
+        {
+            _lastMillis = millis();
 
-        sprintf(strBuf, "/*%i, %i, %i, %i, %i*/\r\n",
-            //_model->RC_interface.RX_payload.throttle,
-            _model->RC_interface.RX_payload.yaw,
-            _model->RC_interface.RX_payload.pitch,
-            _model->RC_interface.RX_payload.roll,            
-            _model->RC_interface.RX_payload.altitude,
-            _model->RC_interface.RX_payload.distance_down);
-            // _model->RC_interface.RX_payload.swi1State,
-            // _model->RC_interface.RX_payload.swi2State,
-            // _model->RC_interface.RX_payload.swi3State);
-        Serial.print(strBuf);
+            switch (_report)
+            {
 
-        #else
+            case RADIO:
 
-        _nokia->clearDisplay();
-        _nokia->setTextSize(1);
-        _nokia->setTextColor(BLACK);
+                sprintf(strBuf, "/*%i, %i, %i, %i, %i, %i, %i, %i, %i, %i*/\r\n",
+                        (int16_t)_model->RC_interface.RX_payload.yaw,
+                        (int16_t)_model->RC_interface.RX_payload.pitch,
+                        (int16_t)_model->RC_interface.RX_payload.roll,
+                        _model->RC_interface.RX_payload.altitude,
+                        _model->RC_interface.RX_payload.distance_down,
+                        _model->RC_interface.RX_payload.distance_front,
+                        (int16_t)_model->RC_interface.RX_payload.pressure,
+                        (int16_t)_model->RC_interface.RX_payload.temperature,
+                        _model->RC_interface.RX_payload.battery,
+                        (uint8_t)_model->RC_interface.isconnect
+                        );
+                Serial.print(strBuf);
 
-        _nokia->setCursor(0, 0);
-        _nokia->println("Yaw :");
-        _nokia->setCursor(40, 0);
-        _nokia->println(_model->RC_interface.RX_payload.yaw);
-        _nokia->display();
+                _nokia->clearDisplay();
+                _nokia->setTextSize(1);
+                _nokia->setTextColor(BLACK);
 
-        _nokia->setCursor(0, 8);
-        _nokia->println("Pitch :");
-        _nokia->setCursor(40, 8);
-        _nokia->println(_model->RC_interface.RX_payload.pitch);
-        _nokia->display();
+                _nokia->setCursor(0, 0);
+                _nokia->println("Yaw :");
+                _nokia->setCursor(40, 0);
+                _nokia->println(_model->RC_interface.RX_payload.yaw);
+                _nokia->display();
 
-        _nokia->setCursor(0, 16);
-        _nokia->println("Roll  :");
-        _nokia->setCursor(55, 16);
-        _nokia->println(_model->RC_interface.RX_payload.roll);
-        _nokia->display();
+                _nokia->setCursor(0, 8);
+                _nokia->println("Pitch :");
+                _nokia->setCursor(40, 8);
+                _nokia->println(_model->RC_interface.RX_payload.pitch);
+                _nokia->display();
 
-        _nokia->setCursor(0, 24);
-        _nokia->println("Alti. :");
-        _nokia->setCursor(55, 24);
-        _nokia->println(_model->RC_interface.RX_payload.altitude);
-        _nokia->display();
+                _nokia->setCursor(0, 16);
+                _nokia->println("Roll  :");
+                _nokia->setCursor(55, 16);
+                _nokia->println(_model->RC_interface.RX_payload.roll);
+                _nokia->display();
 
-        _nokia->setCursor(0, 32);
-        _nokia->print("ground  :");
-        _nokia->setCursor(55, 32);
-        _nokia->println(_model->RC_interface.RX_payload.distance_down);
-        _nokia->display();
+                _nokia->setCursor(0, 24);
+                _nokia->println("Alti. :");
+                _nokia->setCursor(55, 24);
+                _nokia->println(_model->RC_interface.RX_payload.altitude);
+                _nokia->display();
 
-        #endif
-    }/*--------------------- end of upDate -----------------------------------------*/
+                _nokia->setCursor(0, 32);
+                _nokia->print("ground  :");
+                _nokia->setCursor(55, 32);
+                _nokia->println(_model->RC_interface.RX_payload.distance_down);
+                _nokia->display();
+                break;
+
+            case CONTROLLER:
+
+                break;
+            default:
+                Serial.println("Default");
+                break;
+            }
+        }
+
+    } /*--------------------- end of upDate -----------------------------------------*/
 };
 /*------------------------- end of monitor class -----------------------------------*/

@@ -55,6 +55,7 @@ typedef struct
     RX_payload_t RX_payload; 
     TX_payload_t TX_payload;
 } RC_interface_t;
+
 class Radio : public Task::Base {
 
   const uint64_t pipe_RX = 0xF0F0F0E1L;
@@ -71,8 +72,6 @@ public:
     Radio(const String& name)
     : Task::Base(name) {
     }
-
-    virtual ~Radio() {}
 
     Radio *setModel(RC_interface_t *_model)
     { 

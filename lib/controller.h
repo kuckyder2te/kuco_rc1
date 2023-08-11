@@ -6,7 +6,7 @@
 #include <TaskManager.h>
 #include <ezButton.h>
 
-#define LOCAL_DEBUG
+//#define LOCAL_DEBUG
 #include "myLogger.h"
 
 // #include "..\lib\model.h"
@@ -70,6 +70,7 @@ ezButton switchArray[] = {
 
 #define BUTTON_NUM 5
 #define SWITCH_NUM 4
+
 class Controller : public Task::Base
 {
 
@@ -81,8 +82,6 @@ public:
         : Task::Base(name)
     {
     }
-
-    virtual ~Controller(){}
 
     Controller *setModel(interfaceController_t *_model)
     {
@@ -125,7 +124,6 @@ public:
 
     virtual void update() override
     {
-        Serial.println("update");
         // map is considering +/- 100 %
         _interfaceController->throttle = map((analogRead(PIN_THROTTLE)), 0, 1023, -100, 100);
         _interfaceController->yaw = map((analogRead(PIN_YAW)), 0, 1023,-100, 100);
@@ -205,4 +203,4 @@ public:
     }//---------------------- end of alert ------------------------------------------------------//
 };
 
-#endif // MY_CONTRLLER_H
+#endif // MY_CONTROLLER_H
