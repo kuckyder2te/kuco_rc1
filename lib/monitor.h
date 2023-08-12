@@ -106,13 +106,19 @@ private:
     Report_t _report;
 
 public:
+    /// @brief Constructor
+    /// @param name 
+    /// @param report 
+    /// @param delay 
     Monitor(const String &name, Report_t report = Report_t::DEFAULTS, uint16_t delay = DISPLAY_DELAY)
         : Task::Base(name) {
             _lastMillis = millis();
             _report = report;
             _display_delay = delay;
         }
-
+    /// @brief 
+    /// @param _mod 
+    /// @return Reference of himself for multiple function call
     Monitor *setModel(model_t *_mod)
     { // Rückgabe wert ist das eigene Objekt (this)
         LOGGER_VERBOSE("Enter....");

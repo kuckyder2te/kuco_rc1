@@ -18,6 +18,9 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_PCD8544.h>
 #include <TaskManager.h>
+// #include <HardwareSerial.h>
+
+// #define SERIAL_STUDIO
 
 #include "..\lib\radio.h"
 #include "..\lib\Controller.h"
@@ -126,7 +129,8 @@ void main_loop()
                       (uint16_t)model.RC_interface.RX_payload.distance_down,
                       (uint16_t)model.RC_interface.RX_payload.distance_front);
 
-    LOGGER_NOTICE_FMT("Temp: %i", (uint16_t)model.RC_interface.RX_payload.temperature);
+    // LOGGER_NOTICE_FMT("Temp: %i",(uint16_t)model.RC_interface.RX_payload.temperature);
+    // Serial.println(model.RC_interface.RX_payload.temperature);
   }
 
   digitalWrite(LED_MAINLOOP, HIGH);
@@ -140,8 +144,8 @@ Controller *controller;
 void radio_test_setup()
 {
   radio = new Radio("radio");
-  radio->setModel(&model.RC_interface);
-  radio->begin();
+  radio->setModel(&model.RC_interface)->begin();
+  //radio->begin();
   monitor = new Monitor("monitor", Report_t::RADIO);
   monitor->setModel(&model);
   monitor->begin();
@@ -155,7 +159,7 @@ void radio_test_loop()
   radio->update();
   monitor->update();
   controller->update();
-
+  // Assign measurement to TX_Payload for sending to Coppter
   model.RC_interface.TX_payload.rcThrottle = model.interfaceController.throttle;
   model.RC_interface.TX_payload.rcYaw = model.interfaceController.yaw;
   model.RC_interface.TX_payload.rcPitch = model.interfaceController.pitch;
@@ -165,7 +169,6 @@ void radio_test_loop()
   model.RC_interface.TX_payload.rcSwi3 = model.interfaceController.swi3State;
   model.RC_interface.TX_payload.rcAltitudeBaroAdj = model.interfaceController.altitude;
   model.RC_interface.TX_payload.rcAltitudeSonicAdj = model.interfaceController.altitude_down;
-  
 }
 
 #elif _CONTROLLER
