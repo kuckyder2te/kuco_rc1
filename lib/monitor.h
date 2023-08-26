@@ -151,6 +151,9 @@ public:
 
             case CONTROLLER:
                 Serial.println("CONTROLLER");
+                LOGGER_NOTICE_FMT("Button %i", _model->controllers.swi1State());
+
+
                 break;
             default:
                 Serial.println("Default");

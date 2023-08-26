@@ -5,34 +5,11 @@
 
 #include <TaskManager.h>
 #include <ezButton.h>
+#include "config.h"
 
-//#define LOCAL_DEBUG
+#define LOCAL_DEBUG
 #include "myLogger.h"
 
-// #include "..\lib\model.h"
-
-#define PIN_THROTTLE A2
-#define PIN_YAW      A0
-#define PIN_PITCH    A4
-#define PIN_ROLL     A6
-
-#define PIN_ALTITUDE    A8
-#define PIN_ALTITUDE_DOWN A10
-
-#define PIN_BUTTON_1 36   // Button Controller 0 - 4
-#define PIN_BUTTON_2 34
-#define PIN_BUTTON_3 32
-#define PIN_BUTTON_4 A14
-#define PIN_BUTTON_5 A12
-
-#define PIN_SWITCH_1 40   // Scwitch Controller 5 - 8
-#define PIN_SWITCH_2 42
-#define PIN_SWITCH_3 44
-#define PIN_SWITCH_4 46
-
-#define PIN_BUZZER 10
-
-#define PIN_BATTERY A1
 
 typedef struct
 {
@@ -40,19 +17,9 @@ typedef struct
     int battery;
     int altitude;
     int altitude_down ;
-    int swi1State, swi2State, swi3State, swi4State;
+    //int swi1State, swi2State, swi3State, swi4State;
+    bool switchState[SWITCH_NUM];
 } controllers_t;
-
-// ezButton button1(PIN_BUTTON_1);
-// ezButton button2(PIN_BUTTON_2);
-// ezButton button3(PIN_BUTTON_3);
-// ezButton button4(PIN_BUTTON_4);
-// ezButton button5(PIN_BUTTON_5);
-
-// ezButton switch1(PIN_SWITCH_1);
-// ezButton switch2(PIN_SWITCH_2);
-// ezButton switch3(PIN_SWITCH_3);
-// ezButton switch4(PIN_SWITCH_4);
 
 ezButton buttonArray[] = {
     ezButton(PIN_BUTTON_1),
@@ -66,9 +33,6 @@ ezButton switchArray[] = {
     ezButton(PIN_SWITCH_2),
     ezButton(PIN_SWITCH_3),
     ezButton(PIN_SWITCH_4)};
-
-#define BUTTON_NUM 5
-#define SWITCH_NUM 4
 
 class Controller : public Task::Base
 {
@@ -114,36 +78,43 @@ public:
         _controllers->roll = map((analogRead(PIN_ROLL)), 0, 1023, -100, 100);
         _controllers->altitude = map((analogRead(PIN_ALTITUDE)), 0, 1013, 0, 100);
         _controllers->altitude_down = map(analogRead(PIN_ALTITUDE_DOWN), 0, 1023, 0, 200);
-        _controllers->battery = map(analogRead(PIN_BATTERY), 0, 1023, 0, 100);  
+     //   _controllers->battery = map(analogRead(PIN_BATTERY), 0, 1023, 0, 100);  
+        _controllers->battery = analogRead(PIN_BATTERY);  
 
-        LOGGER_NOTICE_FMT("Throttle = %i Yaw = %i Pitch = %i Roll = %i", _controllers->throttle, _controllers->yaw,
-                          _controllers->pitch, _controllers->roll);
+        // LOGGER_NOTICE_FMT("Throttle = %i Yaw = %i Pitch = %i Roll = %i", _controllers->throttle, _controllers->yaw,
+        //                   _controllers->pitch, _controllers->roll);
 
         // LOGGER_NOTICE_FMT("Altitude = %i Altitude US = %i", _controllers->altitude, _controllers->altitude_down);
 
-        // LOGGER_NOTICE_FMT("Battery = %i", _controllers->battery);
+    //    LOGGER_NOTICE_FMT("Battery = %i", _controllers->battery);
 
      //   alert();
 
         
-        for (byte i = 0; i < BUTTON_NUM; i++)
-            buttonArray[i].loop(); // MUST call the loop() function first
+        for (byte i = 0; i < SWITCH_NUM; i++)
+            switchArray[i].loop(); // MUST call the loop() function first
 
-        for (byte i = 0; i < BUTTON_NUM; i++)
+        for (byte i = 0; i < SWITCH_NUM; i++)
         {
-            if (buttonArray[i].isPressed())
+            if (switchArray[i].isPressed())
             {
-                LOGGER_NOTICE_FMT("The button %i ispressed", i + 1);
+                LOGGER_NOTICE_FMT("The switch %i ispressed", i + 1);
+                _controllers->switchState[1] = true;
+                LOGGER_NOTICE_FMT(" Switch %i",_controllers->switchState[i]);
+
             }
 
-            if (buttonArray[i].isReleased())
+            if (switchArray[i].isReleased())
             {
-                LOGGER_NOTICE_FMT("The button %i released", i + 1);
+                LOGGER_NOTICE_FMT("The switch %i released", i + 1);
+                _controllers->switchState[i] = false;
+                LOGGER_NOTICE_FMT(" Switch %i",_controllers->switchState[i]);
+
             }
         }
 
-        for (byte i = 0; i < SWITCH_NUM; i++)
-            switchArray[i].loop(); // MUST call the loop() function first
+        // for (byte i = 0; i < SWITCH_NUM; i++)
+        //     switchArray[i].loop(); // MUST call the loop() function first
 
         // _controllers->swi1State = switchArray[0].getState();
         //     LOGGER_NOTICE_FMT("The switch1 state is %i ", _controllers->swi1State);
@@ -156,18 +127,18 @@ public:
         // _controllers->swi5State = switchArray[4].getState();
         //     LOGGER_NOTICE_FMT("The switch5 state is %i ", _controllers->swi5State);
 
-        for (byte i = 0; i < SWITCH_NUM; i++)
-        {
-            if (switchArray[i].isPressed())
-            {
-                LOGGER_NOTICE_FMT("The switch %i ispressed", i + 1);           
-            }
+        // for (byte i = 0; i < SWITCH_NUM; i++)
+        // {
+        //     if (switchArray[i].isPressed())
+        //     {
+        //         LOGGER_NOTICE_FMT("The switch %i ispressed", i + 1);           
+        //     }
 
-            if (switchArray[i].isReleased())
-            {
-                LOGGER_NOTICE_FMT("The switch %i released", i + 1);
-            }
-        }
+        //     if (switchArray[i].isReleased())
+        //     {
+        //         LOGGER_NOTICE_FMT("The switch %i released", i + 1);
+        //     }
+        // }
         // _controllers.battery = analogRead(PIN_BATTERY);
         // LOGGER_NOTICE_FMT("Battery has %i Volt",_controllers.battery);
     }//---------------------- end of update ------------------------------------------------------//

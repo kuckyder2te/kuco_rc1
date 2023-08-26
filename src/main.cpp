@@ -172,17 +172,21 @@ void radio_test_loop()
 /*--------------------------- end of radio test function ----------------------------------------*/
 
 #elif _CONTROLLER
-
-Controller *_controller;
+Controller *controller;
 Monitor *monitor;
 void controller_test_setup()
 {
+  monitor = new Monitor("monitor", Report_t::CONTROLLER);
+  monitor->setModel(&model)->begin();
+  controller = new Controller("controller");
+  controller->setModel(&model.controllers)->begin();
 }
 
 void controller_test_loop()
 {
+  controller->update();
+  monitor->update();
 }
-
 #endif
 /*--------------------------- end of controller test function -----------------------------------*/
 
