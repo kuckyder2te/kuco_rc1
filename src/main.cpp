@@ -18,9 +18,6 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_PCD8544.h>
 #include <TaskManager.h>
-// #include <HardwareSerial.h>
-
-// #define SERIAL_STUDIO
 
 #include "..\lib\radio.h"
 #include "..\lib\Controller.h"
@@ -47,10 +44,10 @@ void base_setup()
   Serial2.print(" ");
   Serial2.println(__TIME__);
 
-  pinMode(PIN_RADIO_LED, OUTPUT);
-  digitalWrite(PIN_RADIO_LED, LOW);
+  pinMode(LED_RADIO, OUTPUT);
+  digitalWrite(LED_RADIO, LOW);
 
-  pinMode(LED_MAINLOOP, OUTPUT); // Yellow
+  pinMode(LED_MAINLOOP, OUTPUT); // green
   digitalWrite(LED_MAINLOOP, LOW);
 
   pinMode(PIN_BUZZER, OUTPUT);
@@ -65,7 +62,7 @@ void base_setup()
   Logger::setLogLevel(Logger::_DEBUG_); // Muss immer einen Wert in platformio.ini haben (SILENT)
 #endif
 
-  delay(1000);
+  delay(100);
   LOGGER_NOTICE("Program will initialized");
 
   Serial.println("********************************");
@@ -80,8 +77,6 @@ void base_setup()
   Serial.flush();
   Wire.begin();
 
-  // EEPROM.begin(512);
-
   delay(100);
 }
 
@@ -90,7 +85,7 @@ void base_setup()
 void main_setup()
 {
   Tasks.add<Radio>("radio")->setModel(&model.RC_interface)->startFps(10);
-  Tasks.add<Controller>("actuators")->setModel(&model.interfaceController)->startFps(10);
+  Tasks.add<Controller>("actuators")->setModel(&model.controllers)->startFps(10);
   Tasks.add<Monitor>("Monitor")->setModel(&model)->startFps(10);
 
   Serial.println("setup done");
@@ -98,38 +93,39 @@ void main_setup()
 
 void main_loop()
 {
-  Serial.println("loop");
+  //Serial.println("loop");
   static unsigned long _lastMillis = millis();
   Tasks.update();
   digitalWrite(LED_MAINLOOP, LOW);
 
-  model.RC_interface.TX_payload.rcThrottle = model.interfaceController.throttle;
-  model.RC_interface.TX_payload.rcYaw = model.interfaceController.yaw;
-  model.RC_interface.TX_payload.rcPitch = model.interfaceController.pitch;
-  model.RC_interface.TX_payload.rcRoll = model.interfaceController.roll;
-  model.RC_interface.TX_payload.rcSwi1 = model.interfaceController.swi1State;
-  model.RC_interface.TX_payload.rcSwi2 = model.interfaceController.swi2State;
-  model.RC_interface.TX_payload.rcSwi3 = model.interfaceController.swi3State;
-  model.RC_interface.TX_payload.rcAltitudeBaroAdj = model.interfaceController.altitude;
-  model.RC_interface.TX_payload.rcAltitudeSonicAdj = model.interfaceController.altitude_down;
+  model.RC_interface.TX_payload.rcThrottle = model.controllers.throttle;
+  model.RC_interface.TX_payload.rcYaw = model.controllers.yaw;
+  model.RC_interface.TX_payload.rcPitch = model.controllers.pitch;
+  model.RC_interface.TX_payload.rcRoll = model.controllers.roll;
+  model.RC_interface.TX_payload.rcSwi1 = model.controllers.swi1State;
+  model.RC_interface.TX_payload.rcSwi2 = model.controllers.swi2State;
+  model.RC_interface.TX_payload.rcSwi3 = model.controllers.swi3State;
+  model.RC_interface.TX_payload.rcAltitudeBaroAdj = model.controllers.altitude;
+  model.RC_interface.TX_payload.rcAltitudeSonicAdj = model.controllers.altitude_down;
   if (millis() - _lastMillis > 1000)
   {
     _lastMillis = millis();
 
-    LOGGER_NOTICE_FMT("Throttle = %i Yaw = %i Pitch = %i Roll %i,", (uint16_t)model.interfaceController.throttle,
-                      (uint16_t)model.interfaceController.yaw,
-                      (uint16_t)model.interfaceController.pitch,
-                      (uint16_t)model.interfaceController.roll);
+    LOGGER_NOTICE_FMT("Throttle = %i Yaw = %i Pitch = %i Roll %i,", (uint16_t)model.controllers.throttle,
+                      (uint16_t)model.controllers.yaw,
+                      (uint16_t)model.controllers.pitch,
+                      (uint16_t)model.controllers.roll);
 
-    LOGGER_NOTICE_FMT("Swi 1 = %i Swi2 = %i Swi3 = %i,", (uint16_t)model.interfaceController.swi1State,
-                      (uint16_t)model.interfaceController.swi2State,
-                      (uint16_t)model.interfaceController.swi3State);
+    LOGGER_NOTICE_FMT("Swi 1 = %i Swi2 = %i Swi3 = %i,", (uint16_t)model.controllers.swi1State,
+                      (uint16_t)model.controllers.swi2State,
+                      (uint16_t)model.controllers.swi3State);
 
     LOGGER_NOTICE_FMT("Altitude = %i Ground = %i Front = %i,", (uint16_t)model.RC_interface.RX_payload.altitude,
                       (uint16_t)model.RC_interface.RX_payload.distance_down,
                       (uint16_t)model.RC_interface.RX_payload.distance_front);
 
-    // LOGGER_NOTICE_FMT("Temp: %i",(uint16_t)model.RC_interface.RX_payload.temperature);
+   LOGGER_NOTICE_FMT("Temp: %i",(uint16_t)model.RC_interface.RX_payload.temperature);
+   LOGGER_NOTICE_FMT("Batt.: %i",(uint16_t)model.RC_interface.RX_payload.battery);
     // Serial.println(model.RC_interface.RX_payload.temperature);
   }
 
@@ -150,26 +146,30 @@ void radio_test_setup()
   monitor->setModel(&model);
   monitor->begin();
   controller = new Controller("controller");
-  controller->setModel(&model.interfaceController);
+  controller->setModel(&model.controllers);
   controller->begin();
 }
 
 void radio_test_loop()
 {
+  digitalWrite(LED_RADIO, LOW);
   radio->update();
   monitor->update();
   controller->update();
   // Assign measurement to TX_Payload for sending to Coppter
-  model.RC_interface.TX_payload.rcThrottle = model.interfaceController.throttle;
-  model.RC_interface.TX_payload.rcYaw = model.interfaceController.yaw;
-  model.RC_interface.TX_payload.rcPitch = model.interfaceController.pitch;
-  model.RC_interface.TX_payload.rcRoll = model.interfaceController.roll;
-  model.RC_interface.TX_payload.rcSwi1 = model.interfaceController.swi1State;
-  model.RC_interface.TX_payload.rcSwi2 = model.interfaceController.swi2State;
-  model.RC_interface.TX_payload.rcSwi3 = model.interfaceController.swi3State;
-  model.RC_interface.TX_payload.rcAltitudeBaroAdj = model.interfaceController.altitude;
-  model.RC_interface.TX_payload.rcAltitudeSonicAdj = model.interfaceController.altitude_down;
+  model.RC_interface.TX_payload.rcThrottle = model.controllers.throttle;
+  model.RC_interface.TX_payload.rcYaw = model.controllers.yaw;
+  model.RC_interface.TX_payload.rcPitch = model.controllers.pitch;
+  model.RC_interface.TX_payload.rcRoll = model.controllers.roll;
+  model.RC_interface.TX_payload.rcSwi1 = model.controllers.swi1State;
+  model.RC_interface.TX_payload.rcSwi2 = model.controllers.swi2State;
+  model.RC_interface.TX_payload.rcSwi3 = model.controllers.swi3State;
+  model.RC_interface.TX_payload.rcAltitudeBaroAdj = model.controllers.altitude;
+  model.RC_interface.TX_payload.rcAltitudeSonicAdj = model.controllers.altitude_down;
+  digitalWrite(LED_RADIO, HIGH);
+  delay(100);
 }
+/*--------------------------- end of radio test function ----------------------------------------*/
 
 #elif _CONTROLLER
 
@@ -184,6 +184,7 @@ void controller_test_loop()
 }
 
 #endif
+/*--------------------------- end of controller test function -----------------------------------*/
 
 void setup()
 {
@@ -207,3 +208,4 @@ void loop()
   controller_test_loop();
 #endif
 }
+/*--------------------------- end of standart setup and loop function ---------------------------*/

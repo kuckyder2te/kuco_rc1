@@ -19,17 +19,16 @@
 #define PIN_ALTITUDE    A8
 #define PIN_ALTITUDE_DOWN A10
 
-#define PIN_BUTTON_1 36
-#define PIN_BUTTON_2 32
-#define PIN_BUTTON_3 34
+#define PIN_BUTTON_1 36   // Button Controller 0 - 4
+#define PIN_BUTTON_2 34
+#define PIN_BUTTON_3 32
 #define PIN_BUTTON_4 A14
 #define PIN_BUTTON_5 A12
 
-#define PIN_SWITCH_1 38
-#define PIN_SWITCH_2 40
-#define PIN_SWITCH_3 42
-#define PIN_SWITCH_4 44
-//#define PIN_SWITCH_5 46
+#define PIN_SWITCH_1 40   // Scwitch Controller 5 - 8
+#define PIN_SWITCH_2 42
+#define PIN_SWITCH_3 44
+#define PIN_SWITCH_4 46
 
 #define PIN_BUZZER 10
 
@@ -42,18 +41,18 @@ typedef struct
     int altitude;
     int altitude_down ;
     int swi1State, swi2State, swi3State, swi4State;
-} interfaceController_t;
+} controllers_t;
 
-ezButton button1(PIN_BUTTON_1);
-ezButton button2(PIN_BUTTON_2);
-ezButton button3(PIN_BUTTON_3);
-ezButton button4(PIN_BUTTON_4);
-ezButton button5(PIN_BUTTON_5);
+// ezButton button1(PIN_BUTTON_1);
+// ezButton button2(PIN_BUTTON_2);
+// ezButton button3(PIN_BUTTON_3);
+// ezButton button4(PIN_BUTTON_4);
+// ezButton button5(PIN_BUTTON_5);
 
-ezButton switch1(PIN_SWITCH_1);
-ezButton switch2(PIN_SWITCH_2);
-ezButton switch3(PIN_SWITCH_3);
-ezButton switch4(PIN_SWITCH_4);
+// ezButton switch1(PIN_SWITCH_1);
+// ezButton switch2(PIN_SWITCH_2);
+// ezButton switch3(PIN_SWITCH_3);
+// ezButton switch4(PIN_SWITCH_4);
 
 ezButton buttonArray[] = {
     ezButton(PIN_BUTTON_1),
@@ -75,7 +74,7 @@ class Controller : public Task::Base
 {
 
 private:
-    interfaceController_t *_interfaceController;
+    controllers_t *_controllers;
 
 public:
     Controller(const String &name)
@@ -83,10 +82,10 @@ public:
     {
     }
 
-    Controller *setModel(interfaceController_t *_model)
+    Controller *setModel(controllers_t *_model)
     {
         LOGGER_VERBOSE("Enter....");
-        _interfaceController = _model;
+        _controllers = _model;
         LOGGER_VERBOSE("....leave");
         return this;
     }
@@ -104,41 +103,25 @@ public:
             switchArray[i].setDebounceTime(50); // set debounce time to 50 milliseconds
 
         }
-
-        // display.begin();
-        // delay(100);
-        // display.clearDisplay();
-        // display.display();
-        // display.setContrast(60);
-        // display.display();
-        // display.setTextSize(2);
-        // display.setTextColor(BLACK);
-        // display.setCursor(0, 0);
-        // display.println("Kucky");
-        // display.setCursor(10, 25);
-        // display.println("Copter");
-        // display.display();
-        // delay(500);
-        // display.clearDisplay();
     }//---------------------- end of begin ------------------------------------------------------//
 
     virtual void update() override
     {
         // map is considering +/- 100 %
-        _interfaceController->throttle = map((analogRead(PIN_THROTTLE)), 0, 1023, -100, 100);
-        _interfaceController->yaw = map((analogRead(PIN_YAW)), 0, 1023,-100, 100);
-        _interfaceController->pitch = map((analogRead(PIN_PITCH)), 0, 1023, -100, 100); // max. 15.0° must be diveded by 10 on Receiver end
-        _interfaceController->roll = map((analogRead(PIN_ROLL)), 0, 1023, -100, 100);
-        _interfaceController->altitude = map((analogRead(PIN_ALTITUDE)), 0, 1013, 0, 100);
-        _interfaceController->altitude_down = map(analogRead(PIN_ALTITUDE_DOWN), 0, 1023, 0, 200);
-        _interfaceController->battery = map(analogRead(PIN_BATTERY), 0, 1023, 0, 100);  
+        _controllers->throttle = map((analogRead(PIN_THROTTLE)), 0, 1023, -100, 100);
+        _controllers->yaw = map((analogRead(PIN_YAW)), 0, 1023,-100, 100);
+        _controllers->pitch = map((analogRead(PIN_PITCH)), 0, 1023, -100, 100); // max. 15.0° must be diveded by 10 on Receiver end
+        _controllers->roll = map((analogRead(PIN_ROLL)), 0, 1023, -100, 100);
+        _controllers->altitude = map((analogRead(PIN_ALTITUDE)), 0, 1013, 0, 100);
+        _controllers->altitude_down = map(analogRead(PIN_ALTITUDE_DOWN), 0, 1023, 0, 200);
+        _controllers->battery = map(analogRead(PIN_BATTERY), 0, 1023, 0, 100);  
 
-        LOGGER_NOTICE_FMT("Throttle = %i Yaw = %i Pitch = %i Roll = %i", _interfaceController->throttle, _interfaceController->yaw,
-                          _interfaceController->pitch, _interfaceController->roll);
+        LOGGER_NOTICE_FMT("Throttle = %i Yaw = %i Pitch = %i Roll = %i", _controllers->throttle, _controllers->yaw,
+                          _controllers->pitch, _controllers->roll);
 
-        // LOGGER_NOTICE_FMT("Altitude = %i Altitude US = %i", _interfaceController->altitude, _interfaceController->altitude_down);
+        // LOGGER_NOTICE_FMT("Altitude = %i Altitude US = %i", _controllers->altitude, _controllers->altitude_down);
 
-        // LOGGER_NOTICE_FMT("Battery = %i", _interfaceController->battery);
+        // LOGGER_NOTICE_FMT("Battery = %i", _controllers->battery);
 
      //   alert();
 
@@ -162,16 +145,16 @@ public:
         for (byte i = 0; i < SWITCH_NUM; i++)
             switchArray[i].loop(); // MUST call the loop() function first
 
-        // _interfaceController->swi1State = switchArray[0].getState();
-        //     LOGGER_NOTICE_FMT("The switch1 state is %i ", _interfaceController->swi1State);
-        // _interfaceController->swi2State = switchArray[1].getState();
-        //     LOGGER_NOTICE_FMT("The switch2 state is %i ", _interfaceController->swi2State);
-        // _interfaceController->swi3State = switchArray[2].getState();
-        //     LOGGER_NOTICE_FMT("The switch3 state is %i ", _interfaceController->swi3State);
-        // _interfaceController->swi4State = switchArray[3].getState();
-        //     LOGGER_NOTICE_FMT("The switch4 state is %i ", _interfaceController->swi4State);
-        // _interfaceController->swi5State = switchArray[4].getState();
-        //     LOGGER_NOTICE_FMT("The switch5 state is %i ", _interfaceController->swi5State);
+        // _controllers->swi1State = switchArray[0].getState();
+        //     LOGGER_NOTICE_FMT("The switch1 state is %i ", _controllers->swi1State);
+        // _controllers->swi2State = switchArray[1].getState();
+        //     LOGGER_NOTICE_FMT("The switch2 state is %i ", _controllers->swi2State);
+        // _controllers->swi3State = switchArray[2].getState();
+        //     LOGGER_NOTICE_FMT("The switch3 state is %i ", _controllers->swi3State);
+        // _controllers->swi4State = switchArray[3].getState();
+        //     LOGGER_NOTICE_FMT("The switch4 state is %i ", _controllers->swi4State);
+        // _controllers->swi5State = switchArray[4].getState();
+        //     LOGGER_NOTICE_FMT("The switch5 state is %i ", _controllers->swi5State);
 
         for (byte i = 0; i < SWITCH_NUM; i++)
         {
@@ -185,13 +168,13 @@ public:
                 LOGGER_NOTICE_FMT("The switch %i released", i + 1);
             }
         }
-        // _interfaceController.battery = analogRead(PIN_BATTERY);
-        // LOGGER_NOTICE_FMT("Battery has %i Volt",_interfaceController.battery);
+        // _controllers.battery = analogRead(PIN_BATTERY);
+        // LOGGER_NOTICE_FMT("Battery has %i Volt",_controllers.battery);
     }//---------------------- end of update ------------------------------------------------------//
 
     void alert(){
         int lastMillis = millis();
-        if(_interfaceController->battery > 50)
+        if(_controllers->battery > 50)
              if(millis()-lastMillis > 1000){
                  digitalWrite(PIN_BUZZER, HIGH);
                  lastMillis = millis();

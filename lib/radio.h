@@ -7,20 +7,14 @@
 #include <RF24.h>
 #include <../lib/myLogger.h>
 
-// #define LOCAL_DEBUG
+#define LOCAL_DEBUG
 #include "myLogger.h"
 
-#define PIN_CE 49
+#define PIN_CE  49
 #define PIN_CSN 53
 
 #define LED_ALERT 10
-#define PIN_RADIO_LED 1
-
-#define NOKIA_CLK 23
-#define NOKIA_DIN 25
-#define NOKIA_DC 27
-#define NOKIA_CS 29
-#define NOKIA_RST 31
+#define LED_RADIO 6
 
 typedef struct __attribute__((__packed__))
 {
@@ -112,6 +106,8 @@ public:
     RC_interface->isconnect = _radio->write(&RC_interface->TX_payload, sizeof(TX_payload_t)); // transmit & save the report
     if (RC_interface->isconnect)
     {
+      digitalWrite(LED_RADIO, LOW);
+      
       write_to_the_drohne();
 
       if (_radio->available())
@@ -123,10 +119,11 @@ public:
       {
         LOGGER_FATAL("Recieved: an empty ACK packet");
       }
+      digitalWrite(LED_RADIO, HIGH);
     }
     else
     {
-      LOGGER_FATAL("Transmission failed or timed out"); // payload was not delivered  // payload was not delivered
+      //LOGGER_FATAL("Transmission failed or timed out"); // payload was not delivered  // payload was not delivered
     }
   } //---------------------- end of update ------------------------------------------------------//
 
