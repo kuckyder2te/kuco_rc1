@@ -12,6 +12,7 @@
 #include <TaskManager.h>
 #include <print.h>
 #include <stdio.h>
+#include "config.h"
 
 #include "model.h"
 
@@ -19,14 +20,6 @@
 #include "myLogger.h"
 
 char strBuf[100];
-
-#define PIN_NOKIA_CLK 23
-#define PIN_NOKIA_DIN 25
-#define PIN_NOKIA_DC  27
-#define PIN_NOKIA_CS  29
-#define PIN_NOKIA_RST 31
-
-#define DISPLAY_DELAY 1000
 
 typedef enum
 {
@@ -150,10 +143,11 @@ public:
                 break;
 
             case CONTROLLER:
-                Serial.println("CONTROLLER");
-                LOGGER_NOTICE_FMT("Button %i", _model->controllers.swi1State());
-
-
+            //    Serial.println("CONTROLLER");
+                LOGGER_NOTICE_FMT("Switch 1", _model->controllers.swi1State());
+                LOGGER_NOTICE_FMT("Switch 2", _model->controllers.swi2State());
+                LOGGER_NOTICE_FMT("Switch 3", _model->controllers.swi3State());
+                LOGGER_NOTICE_FMT("Switch 4", _model->controllers.swi4State());
                 break;
             default:
                 Serial.println("Default");

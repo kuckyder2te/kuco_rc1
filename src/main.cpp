@@ -18,6 +18,8 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_PCD8544.h>
 #include <TaskManager.h>
+#include "config.h"
+#include "..\resources\intro.h"
 
 #include "..\lib\radio.h"
 #include "..\lib\Controller.h"
@@ -26,11 +28,6 @@
 
 // #define LOCAL_DEBUG
 #include "..\lib\myLogger.h"
-
-#define COM_SPEED 115200
-#define BT_SPEED 115200
-
-#define LED_MAINLOOP 4 // yellow
 
 model_t model;
 
@@ -65,19 +62,8 @@ void base_setup()
   delay(100);
   LOGGER_NOTICE("Program will initialized");
 
-  Serial.println("********************************");
-  Serial.println("*       KuCo RC                *");
-  Serial.println("*                              *");
-  Serial.print("*     ");
-  Serial.print(__DATE__);
-  Serial.print(" ");
-  Serial.print(__TIME__);
-  Serial.println("     *");
-  Serial.println("********************************");
-  Serial.flush();
-  Wire.begin();
+    Wire.begin();
 
-  delay(100);
 }
 
 #ifdef _MAIN
@@ -105,6 +91,7 @@ void main_loop()
   model.RC_interface.TX_payload.rcSwi1 = model.controllers.swi1State;
   model.RC_interface.TX_payload.rcSwi2 = model.controllers.swi2State;
   model.RC_interface.TX_payload.rcSwi3 = model.controllers.swi3State;
+  model.RC_interface.TX_payload.rcSwi4 = model.controllers.swi4State;
   model.RC_interface.TX_payload.rcAltitudeBaroAdj = model.controllers.altitude;
   model.RC_interface.TX_payload.rcAltitudeSonicAdj = model.controllers.altitude_down;
   if (millis() - _lastMillis > 1000)
@@ -133,60 +120,61 @@ void main_loop()
 }
 // MAIN end
 #elif _RADIO
+#include "..\test\radio_test.h"
+// Radio *radio;
+// Monitor *monitor;
+// Controller *controller;
+// void radio_test_setup()
+// {
+//   radio = new Radio("radio");
+//   radio->setModel(&model.RC_interface)->begin();
+//   //radio->begin();
+//   monitor = new Monitor("monitor", Report_t::RADIO);
+//   monitor->setModel(&model);
+//   monitor->begin();
+//   controller = new Controller("controller");
+//   controller->setModel(&model.controllers);
+//   controller->begin();
+// }
 
-Radio *radio;
-Monitor *monitor;
-Controller *controller;
-void radio_test_setup()
-{
-  radio = new Radio("radio");
-  radio->setModel(&model.RC_interface)->begin();
-  //radio->begin();
-  monitor = new Monitor("monitor", Report_t::RADIO);
-  monitor->setModel(&model);
-  monitor->begin();
-  controller = new Controller("controller");
-  controller->setModel(&model.controllers);
-  controller->begin();
-}
-
-void radio_test_loop()
-{
-  digitalWrite(LED_RADIO, LOW);
-  radio->update();
-  monitor->update();
-  controller->update();
-  // Assign measurement to TX_Payload for sending to Coppter
-  model.RC_interface.TX_payload.rcThrottle = model.controllers.throttle;
-  model.RC_interface.TX_payload.rcYaw = model.controllers.yaw;
-  model.RC_interface.TX_payload.rcPitch = model.controllers.pitch;
-  model.RC_interface.TX_payload.rcRoll = model.controllers.roll;
-  model.RC_interface.TX_payload.rcSwi1 = model.controllers.swi1State;
-  model.RC_interface.TX_payload.rcSwi2 = model.controllers.swi2State;
-  model.RC_interface.TX_payload.rcSwi3 = model.controllers.swi3State;
-  model.RC_interface.TX_payload.rcAltitudeBaroAdj = model.controllers.altitude;
-  model.RC_interface.TX_payload.rcAltitudeSonicAdj = model.controllers.altitude_down;
-  digitalWrite(LED_RADIO, HIGH);
-  delay(100);
+// void radio_test_loop()
+// {
+//   digitalWrite(LED_RADIO, LOW);
+//   radio->update();
+//   monitor->update();
+//   controller->update();
+//   // Assign measurement to TX_Payload for sending to Coppter
+//   model.RC_interface.TX_payload.rcThrottle = model.controllers.throttle;
+//   model.RC_interface.TX_payload.rcYaw = model.controllers.yaw;
+//   model.RC_interface.TX_payload.rcPitch = model.controllers.pitch;
+//   model.RC_interface.TX_payload.rcRoll = model.controllers.roll;
+//   model.RC_interface.TX_payload.rcSwi1 = model.controllers.swi1State;
+//   model.RC_interface.TX_payload.rcSwi2 = model.controllers.swi2State;
+//   model.RC_interface.TX_payload.rcSwi3 = model.controllers.swi3State;
+//   model.RC_interface.TX_payload.rcAltitudeBaroAdj = model.controllers.altitude;
+//   model.RC_interface.TX_payload.rcAltitudeSonicAdj = model.controllers.altitude_down;
+//   digitalWrite(LED_RADIO, HIGH);
+//   delay(100);
 }
 /*--------------------------- end of radio test function ----------------------------------------*/
 
 #elif _CONTROLLER
-Controller *controller;
-Monitor *monitor;
-void controller_test_setup()
-{
-  monitor = new Monitor("monitor", Report_t::CONTROLLER);
-  monitor->setModel(&model)->begin();
-  controller = new Controller("controller");
-  controller->setModel(&model.controllers)->begin();
-}
+#include "..\test\controller_test.h";
+// Controller *controller;
+// Monitor *monitor;
+// void controller_test_setup()
+// {
+//   monitor = new Monitor("monitor", Report_t::CONTROLLER);
+//   monitor->setModel(&model)->begin();
+//   controller = new Controller("controller");
+//   controller->setModel(&model.controllers)->begin();
+// }
 
-void controller_test_loop()
-{
-  controller->update();
-  monitor->update();
-}
+// void controller_test_loop()
+// {
+//   controller->update();
+//   monitor->update();
+// }
 #endif
 /*--------------------------- end of controller test function -----------------------------------*/
 
@@ -195,10 +183,8 @@ void setup()
   base_setup();
 #ifdef _MAIN
   main_setup();
-#elif _RADIO
-  radio_test_setup();
-#elif _CONTROLLER
-  controller_test_setup();
+#else
+  test_setup();
 #endif
 }
 
@@ -206,10 +192,8 @@ void loop()
 {
 #ifdef _MAIN
   main_loop();
-#elif _RADIO
-  radio_test_loop();
-#elif _CONTROLLER
-  controller_test_loop();
+#else
+  test_loop();
 #endif
 }
 /*--------------------------- end of standart setup and loop function ---------------------------*/

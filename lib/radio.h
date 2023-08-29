@@ -10,11 +10,7 @@
 #define LOCAL_DEBUG
 #include "myLogger.h"
 
-#define PIN_CE  49
-#define PIN_CSN 53
 
-#define LED_ALERT 10
-#define LED_RADIO 6
 
 typedef struct __attribute__((__packed__))
 {
@@ -153,4 +149,5 @@ public:
     LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi3, debugTX_payload.rcAltitudeSonicAdj, "Adjust Ground = %i", RC_interface->TX_payload.rcAltitudeSonicAdj);
   }
 };
+/*------------------------- end of radio class --------------------------------------------------*/
 #endif // MY_RADIO_H
