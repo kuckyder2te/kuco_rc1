@@ -19,12 +19,11 @@ protected:
 public:
     Menu(String name){
 
-
     }
 
-
-
     void set(uint8_t x){
+
+        LOGGER_NOTICE("Set");
 
         switch (x)
         {

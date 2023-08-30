@@ -119,62 +119,12 @@ void main_loop()
   digitalWrite(LED_MAINLOOP, HIGH);
 }
 // MAIN end
+/*--------------------------- end of main loop --------------------------------------------------*/
+
 #elif _RADIO
-#include "..\test\radio_test.h"
-// Radio *radio;
-// Monitor *monitor;
-// Controller *controller;
-// void radio_test_setup()
-// {
-//   radio = new Radio("radio");
-//   radio->setModel(&model.RC_interface)->begin();
-//   //radio->begin();
-//   monitor = new Monitor("monitor", Report_t::RADIO);
-//   monitor->setModel(&model);
-//   monitor->begin();
-//   controller = new Controller("controller");
-//   controller->setModel(&model.controllers);
-//   controller->begin();
-// }
-
-// void radio_test_loop()
-// {
-//   digitalWrite(LED_RADIO, LOW);
-//   radio->update();
-//   monitor->update();
-//   controller->update();
-//   // Assign measurement to TX_Payload for sending to Coppter
-//   model.RC_interface.TX_payload.rcThrottle = model.controllers.throttle;
-//   model.RC_interface.TX_payload.rcYaw = model.controllers.yaw;
-//   model.RC_interface.TX_payload.rcPitch = model.controllers.pitch;
-//   model.RC_interface.TX_payload.rcRoll = model.controllers.roll;
-//   model.RC_interface.TX_payload.rcSwi1 = model.controllers.swi1State;
-//   model.RC_interface.TX_payload.rcSwi2 = model.controllers.swi2State;
-//   model.RC_interface.TX_payload.rcSwi3 = model.controllers.swi3State;
-//   model.RC_interface.TX_payload.rcAltitudeBaroAdj = model.controllers.altitude;
-//   model.RC_interface.TX_payload.rcAltitudeSonicAdj = model.controllers.altitude_down;
-//   digitalWrite(LED_RADIO, HIGH);
-//   delay(100);
-}
-/*--------------------------- end of radio test function ----------------------------------------*/
-
+  #include "..\test\radio_test.h"
 #elif _CONTROLLER
-#include "..\test\controller_test.h";
-// Controller *controller;
-// Monitor *monitor;
-// void controller_test_setup()
-// {
-//   monitor = new Monitor("monitor", Report_t::CONTROLLER);
-//   monitor->setModel(&model)->begin();
-//   controller = new Controller("controller");
-//   controller->setModel(&model.controllers)->begin();
-// }
-
-// void controller_test_loop()
-// {
-//   controller->update();
-//   monitor->update();
-// }
+  #include "..\test\controller_test.h";
 #endif
 /*--------------------------- end of controller test function -----------------------------------*/
 

@@ -18,13 +18,13 @@ typedef struct
     int battery;
     int altitude;
     int altitude_down;
-    // int swi1State, swi2State, swi3State, swi4State;
+    int swi1State, swi2State, swi3State, swi4State;
     bool switchState[SWITCH_NUM];
 } controllers_t;
 
 typedef enum
 {
-    down = 0,   
+    down = 0,
     save,
     mode,
     set,
@@ -33,29 +33,32 @@ typedef enum
 
 typedef enum
 {
-    adjust_on = 0,   
-    NN1,
+    adjust_on = 0,
+    hold_position,
     autonom,
-    NN2
-}switch_e;
+    NN
+} switch_e;
 
 ezButton buttonArray[] =
-{
-    ezButton(PIN_BUTTON_1),
-    ezButton(PIN_BUTTON_2),
-    ezButton(PIN_BUTTON_3),
-    ezButton(PIN_BUTTON_4),
-    ezButton(PIN_BUTTON_5)};
+    {
+        ezButton(PIN_BUTTON_1),
+        ezButton(PIN_BUTTON_2),
+        ezButton(PIN_BUTTON_3),
+        ezButton(PIN_BUTTON_4),
+        ezButton(PIN_BUTTON_5)};
 
-ezButton switchArray[] = 
-{
-    ezButton(PIN_SWITCH_1),
-    ezButton(PIN_SWITCH_2),
-    ezButton(PIN_SWITCH_3),
-    ezButton(PIN_SWITCH_4)};
+ezButton switchArray[] =
+    {
+        ezButton(PIN_SWITCH_1),
+        ezButton(PIN_SWITCH_2),
+        ezButton(PIN_SWITCH_3),
+        ezButton(PIN_SWITCH_4)};
 
 class Controller : public Task::Base
 {
+
+protected:
+  //  Adafruit_PCD8544 *_nokia;
 
 private:
     controllers_t *_controllers;
@@ -97,11 +100,25 @@ public:
         {
             switchArray[i].setDebounceTime(50); // set debounce time to 50 milliseconds
         }
+
+//        _nokia->begin();
+//        _nokia->setContrast(60);
+        
+//         _nokia->clearDisplay();
+// _nokia->display();
+//    _nokia->display();
+//         _nokia->setTextSize(2);
+//         _nokia->setTextColor(BLACK);
+//         _nokia->setCursor(0, 0);
+//         _nokia->println("Adjust JTs");
+
+//         _nokia->display();
+
     } //---------------------- end of begin ------------------------------------------------------//
 
     virtual void update() override
     {
-        static uint8_t count = 0;
+        static uint8_t mode = 0;
         // map is considering +/- 100 %
         _controllers->throttle = map((analogRead(PIN_THROTTLE)), 0, 1023, -100, 100);
         _controllers->yaw = map((analogRead(PIN_YAW)), 0, 1023, -100, 100);
@@ -110,136 +127,131 @@ public:
         _controllers->altitude = map((analogRead(PIN_ALTITUDE)), 0, 1013, 0, 100);
         _controllers->altitude_down = map(analogRead(PIN_ALTITUDE_DOWN), 0, 1023, 0, 200);
         //   _controllers->battery = map(analogRead(PIN_BATTERY), 0, 1023, 0, 100);
-       // _controllers->battery = analogRead(PIN_BATTERY);
+        // _controllers->battery = analogRead(PIN_BATTERY);
 
         // LOGGER_NOTICE_FMT("Throttle = %i Yaw = %i Pitch = %i Roll = %i", _controllers->throttle, _controllers->yaw,
         //                   _controllers->pitch, _controllers->roll);
 
         // LOGGER_NOTICE_FMT("Altitude = %i Altitude US = %i", _controllers->altitude, _controllers->altitude_down);
 
-        //LOGGER_NOTICE_FMT("Battery = %i", _controllers->battery);
+        // LOGGER_NOTICE_FMT("Battery = %i", _controllers->battery);
 
         //   alert();
+
+        // LOGGER_NOTICE_FMT("_throttleOffset %i",_throttleOffset);  ist 0
+        //  LOGGER_NOTICE_FMT("_yawOffset %i",_yawOffset);
 
         for (byte i = 0; i < SWITCH_NUM; i++)
             switchArray[i].loop(); // MUST call the loop() function first
 
-
-        if(switchArray[0].isPressed())
+        if (switchArray[0].isPressed())
             LOGGER_NOTICE("Switch 0");
-           
+        else if (switchArray[1].isPressed())
+            LOGGER_NOTICE("Switch 1");
+        else if (switchArray[2].isPressed())
+            LOGGER_NOTICE("Switch 2");
+        else if (switchArray[3].isPressed())
+            LOGGER_NOTICE("Switch 3");
 
-        for (byte i = 0; i < SWITCH_NUM; i++)
-        {
-            if (switchArray[i].isPressed())
-            {
-                LOGGER_NOTICE_FMT("The switch %i ispressed", i + 1);
-                _controllers->switchState[1] = true;
-                LOGGER_NOTICE_FMT(" Switch %i", _controllers->switchState[i]);
-            }
-
-            if (switchArray[i].isReleased())
-            {
-                LOGGER_NOTICE_FMT("The switch %i released", i + 1);
-                _controllers->switchState[i] = false;
-                LOGGER_NOTICE_FMT(" Switch %i", _controllers->switchState[i]);
-            }
-        }
+         //   _menuOption->set(100);  // ist getestet
 
         for (byte i = 0; i < BUTTON_NUM; i++)
             buttonArray[i].loop(); // MUST call the loop() function first
 
         // Vote the option ,throttle, yaw, pitch or roll
-        if(buttonArray[button_e::mode].isPressed())
+        if (buttonArray[button_e::mode].isPressed())
         {
-            count++;
-        
-            if(count > 5)
-                count = 1;
-            LOGGER_NOTICE_FMT("Count %i ", count);                  
+            mode++;
+
+            if (mode > 4)
+                mode = 1;
+
+            switch (mode)
+            {
+                case 1:
+                LOGGER_NOTICE("Throttle is choosen");
+                break;
+                case 2:
+                LOGGER_NOTICE("Yaw is choosen");
+                break;
+                case 3:
+                LOGGER_NOTICE("Pitch is choosen");
+                break;
+                case 4:
+                LOGGER_NOTICE("Roll is choosen");
+                break;
+            }
         }
 
         // Set the chosen option.
-        if(buttonArray[button_e::set].isPressed())
+        if (buttonArray[button_e::set].isPressed())
         {
-            _mode = count;
+            //_mode = count;
             LOGGER_NOTICE_FMT("Mode %i ", _mode);
         }
 
         // increase the value
-        if(buttonArray[button_e::up].isPressed())
+        if (buttonArray[button_e::up].isPressed())
         {
             switch (_mode)
             {
             case 1:
                 _throttleOffset++;
-                LOGGER_NOTICE_FMT("Throttle %i",_throttleOffset);
+                LOGGER_NOTICE_FMT("_throttleOffset++ %i", _throttleOffset);
                 break;
-             case 2:
+            case 2:
                 _yawOffset++;
-                LOGGER_NOTICE_FMT("Yaw %i",_yawOffset);
+                LOGGER_NOTICE_FMT("_yawOffset++ %i", _yawOffset);
                 break;
-             case 3:
+            case 3:
                 _pitchOffset++;
-                LOGGER_NOTICE_FMT("Pitch %i",_pitchOffset);
+                LOGGER_NOTICE_FMT("_pitchOffset++ %i", _pitchOffset);
                 break;
-             case 4:
+            case 4:
                 _rollOffset++;
-                LOGGER_NOTICE_FMT("Roll %i", _rollOffset);
-                break; 
-                                 
+                LOGGER_NOTICE_FMT("_rollOffset++ %i", _rollOffset);
+                break;
+
             default:
                 break;
             }
         }
 
         // decrease the value
-        if(buttonArray[button_e::up].isPressed())
+        if (buttonArray[button_e::down].isPressed())
         {
             switch (_mode)
             {
             case 1:
                 _throttleOffset--;
-                if(_throttleOffset < 0)
+                if (_throttleOffset < 0)
                     _throttleOffset = 0;
-                LOGGER_NOTICE_FMT("Throttle %i",_throttleOffset);
+                LOGGER_NOTICE_FMT("Throttle %i", _throttleOffset);
                 break;
-             case 2:
+            case 2:
                 _yawOffset--;
-                if(_yawOffset < 0)
+                if (_yawOffset < 0)
                     _yawOffset = 0;
-                LOGGER_NOTICE_FMT("Yaw %i",_yawOffset);
+                LOGGER_NOTICE_FMT("Yaw %i", _yawOffset);
                 break;
-             case 3:
+            case 3:
                 _pitchOffset--;
-                if(_pitchOffset < 0)
+                if (_pitchOffset < 0)
                     _pitchOffset = 0;
-                LOGGER_NOTICE_FMT("Pitch %i",_pitchOffset);
+                LOGGER_NOTICE_FMT("Pitch %i", _pitchOffset);
                 break;
-             case 4:
+            case 4:
                 _rollOffset--;
-                if(_rollOffset < 0)
+                if (_rollOffset < 0)
                     _rollOffset = 0;
                 LOGGER_NOTICE_FMT("Roll %i", _rollOffset);
-                break; 
-                                 
+                break;
+
             default:
                 break;
             }
-        }       
+        }
 
-        // for (byte i = 0; i < BUTTON_NUM; i++)
-        // {
-        //     if (buttonArray[i].isPressed())
-        //     {
-        //         LOGGER_NOTICE_FMT("The button %i ispressed", i + 1);
-        //     }
-
-        //     if (buttonArray[i].isReleased())
-        //     {
-        //         LOGGER_NOTICE_FMT("The button %i released", i + 1);
-        //     }
-        // }
         // _controllers.battery = analogRead(PIN_BATTERY);
         // LOGGER_NOTICE_FMT("Battery has %i Volt",_controllers.battery);
     } //---------------------- end of update ------------------------------------------------------//
