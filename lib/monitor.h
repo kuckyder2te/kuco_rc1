@@ -16,7 +16,7 @@
 
 #include "model.h"
 
-// #define LOCAL_DEBUG
+#define LOCAL_DEBUG
 #include "myLogger.h"
 
 char strBuf[100];
@@ -33,6 +33,7 @@ class Monitor : public Task::Base
 
 protected:
     Adafruit_PCD8544 *_nokia;
+    Controller *_controller;
 
 private:
     model_t *_model;
@@ -65,6 +66,8 @@ public:
 
     virtual void begin() override
     {
+
+        _controller = new Controller("controller");
         _nokia = new Adafruit_PCD8544(PIN_NOKIA_CLK, PIN_NOKIA_DIN, PIN_NOKIA_DC, PIN_NOKIA_CS, PIN_NOKIA_RST);
 
         _nokia->begin();
@@ -103,57 +106,78 @@ public:
     {
         static uint32_t lastIntervall = millis();
         static bool toogle;
+    
+//        if(_controller->switchAdjust){
 
-        if (millis() - _lastMillis > _display_delay)
-        {
-            _lastMillis = millis();
+            _nokia->clearDisplay();
 
-            switch (_report)
-            {
+            _nokia->setTextSize(2);
+            _nokia->setTextColor(BLACK);
+            _nokia->setCursor(0, 0);
+            _nokia->println("Adjust");
+            _nokia->display();
 
-            case RADIO:
-                Serial.println("RC RADIO");
-                sprintf(strBuf, "/*%i, %i, %i, %i, %i, %i, %i, %i, %i, %i*/\r\n",
-                        (int16_t)_model->RC_interface.RX_payload.yaw,
-                        (int16_t)_model->RC_interface.RX_payload.pitch,
-                        (int16_t)_model->RC_interface.RX_payload.roll,
-                        _model->RC_interface.RX_payload.altitude,
-                        _model->RC_interface.RX_payload.distance_down,
-                        _model->RC_interface.RX_payload.distance_front,
-                        (int16_t)_model->RC_interface.RX_payload.pressure,
-                        (int16_t)_model->RC_interface.RX_payload.temperature,
-                        _model->RC_interface.RX_payload.battery,
-                        (uint8_t)_model->RC_interface.isconnect);
-                Serial.print(strBuf);         // auskommentiert wegen leerer Daten
+            int test =_controller->getThrottle();
 
-                // if (millis() - lastIntervall > 5000)
-                // {
-                //     toogle = !toogle;
-                //     lastIntervall = millis();
-                // }
+        //    LOGGER_NOTICE_FMT("getThrottle %i", test);
 
-                // if (toogle)
-                // {
-                     display_screen_1();
-                // }
-                // else
-                // {
-                //     display_screen_2();
-                // }
-                break;
+            _nokia->setTextSize(1);
+            _nokia->setCursor(5, 20);
+            _nokia->println(test);
+            _nokia->display();
 
-            case CONTROLLER:
-            //    Serial.println("CONTROLLER");
-                LOGGER_NOTICE_FMT("Switch 1", _model->controllers.swi1State());
-                LOGGER_NOTICE_FMT("Switch 2", _model->controllers.swi2State());
-                LOGGER_NOTICE_FMT("Switch 3", _model->controllers.swi3State());
-                LOGGER_NOTICE_FMT("Switch 4", _model->controllers.swi4State());
-                break;
-            default:
-                Serial.println("Default");
-                break;
-            }
-        }
+  //      }
+
+        // if (millis() - _lastMillis > _display_delay)
+        // {
+        //     _lastMillis = millis();
+
+        //     switch (_report)
+        //     {
+
+        //     case RADIO:
+        //         Serial.println("RC RADIO");
+        //         sprintf(strBuf, "/*%i, %i, %i, %i, %i, %i, %i, %i, %i, %i*/\r\n",
+        //                 (int16_t)_model->RC_interface.RX_payload.yaw,
+        //                 (int16_t)_model->RC_interface.RX_payload.pitch,
+        //                 (int16_t)_model->RC_interface.RX_payload.roll,
+        //                 _model->RC_interface.RX_payload.altitude,
+        //                 _model->RC_interface.RX_payload.distance_down,
+        //                 _model->RC_interface.RX_payload.distance_front,
+        //                 (int16_t)_model->RC_interface.RX_payload.pressure,
+        //                 (int16_t)_model->RC_interface.RX_payload.temperature,
+        //                 _model->RC_interface.RX_payload.battery,
+        //                 (uint8_t)_model->RC_interface.isconnect);
+        //         Serial.print(strBuf);         // auskommentiert wegen leerer Daten
+
+        //         // if (millis() - lastIntervall > 5000)
+        //         // {
+        //         //     toogle = !toogle;
+        //         //     lastIntervall = millis();
+        //         // }
+
+        //         // if (toogle)
+        //         // {
+        //              display_screen_1();
+        //         // }
+        //         // else
+        //         // {
+        //         //     display_screen_2();
+        //         // }
+        //         break;
+
+        //     case CONTROLLER:
+        //     //    Serial.println("CONTROLLER");
+        //         LOGGER_NOTICE_FMT("Switch 1", _model->controllers.swi1State());
+        //         LOGGER_NOTICE_FMT("Switch 2", _model->controllers.swi2State());
+        //         LOGGER_NOTICE_FMT("Switch 3", _model->controllers.swi3State());
+        //         LOGGER_NOTICE_FMT("Switch 4", _model->controllers.swi4State());
+        //         break;
+        //     default:
+        //         Serial.println("Default");
+        //         break;
+        //     }
+        // }
 
     } /*--------------------- end of update -----------------------------------------------------*/
 
@@ -237,5 +261,9 @@ public:
         _nokia->display();
 
     } /*--------------------- end of display_screen_2 -------------------------------------------*/
+
+    void set(int x){
+        LOGGER_NOTICE_FMT("Throttle %i", x);
+    }
 };
 /*------------------------- end of monitor class ------------------------------------------------*/

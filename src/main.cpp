@@ -91,7 +91,7 @@ void main_loop()
   model.RC_interface.TX_payload.rcSwi1 = model.controllers.swi1State;
   model.RC_interface.TX_payload.rcSwi2 = model.controllers.swi2State;
   model.RC_interface.TX_payload.rcSwi3 = model.controllers.swi3State;
-  model.RC_interface.TX_payload.rcSwi4 = model.controllers.swi4State;
+  //model.RC_interface.TX_payload.rcSwi4 = model.controllers.swi4State;
   model.RC_interface.TX_payload.rcAltitudeBaroAdj = model.controllers.altitude;
   model.RC_interface.TX_payload.rcAltitudeSonicAdj = model.controllers.altitude_down;
   if (millis() - _lastMillis > 1000)

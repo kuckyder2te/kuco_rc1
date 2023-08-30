@@ -33,9 +33,9 @@ typedef enum
 
 typedef enum
 {
-    adjust_on = 0,
     hold_position,
     autonom,
+    adjust_on,
     NN
 } switch_e;
 
@@ -58,24 +58,29 @@ class Controller : public Task::Base
 {
 
 protected:
-  //  Adafruit_PCD8544 *_nokia;
-
+    
 private:
     controllers_t *_controllers;
     button_e _button;
     switch_e _switch;
 
     Menu *_menuOption;
-    uint8_t _mode;
+ 
+public:
+
+    bool switchAdjust = false;
+    //bool switchYaw = false;
+
     uint8_t _throttleOffset = 0;
     uint8_t _yawOffset = 0;
     uint8_t _pitchOffset = 0;
-    uint8_t _rollOffset = 0;
+    uint8_t _rollOffset = 0; 
+    
 
 public:
     Controller(const String &name)
         : Task::Base(name)
-    {
+    {   
     }
 
     Controller *setModel(controllers_t *_model)
@@ -89,7 +94,6 @@ public:
     virtual void begin() override
     {
         _menuOption = new Menu("menu");
-        byte _mode = 10;
 
         for (byte i = 0; i < BUTTON_NUM; i++)
         {
@@ -101,24 +105,11 @@ public:
             switchArray[i].setDebounceTime(50); // set debounce time to 50 milliseconds
         }
 
-//        _nokia->begin();
-//        _nokia->setContrast(60);
-        
-//         _nokia->clearDisplay();
-// _nokia->display();
-//    _nokia->display();
-//         _nokia->setTextSize(2);
-//         _nokia->setTextColor(BLACK);
-//         _nokia->setCursor(0, 0);
-//         _nokia->println("Adjust JTs");
-
-//         _nokia->display();
-
-    } //---------------------- end of begin ------------------------------------------------------//
+    } //---------------------- end of begin -----------------------------------------------//
 
     virtual void update() override
     {
-        static uint8_t mode = 0;
+        static uint8_t _mode = 0;
         // map is considering +/- 100 %
         _controllers->throttle = map((analogRead(PIN_THROTTLE)), 0, 1023, -100, 100);
         _controllers->yaw = map((analogRead(PIN_YAW)), 0, 1023, -100, 100);
@@ -129,18 +120,6 @@ public:
         //   _controllers->battery = map(analogRead(PIN_BATTERY), 0, 1023, 0, 100);
         // _controllers->battery = analogRead(PIN_BATTERY);
 
-        // LOGGER_NOTICE_FMT("Throttle = %i Yaw = %i Pitch = %i Roll = %i", _controllers->throttle, _controllers->yaw,
-        //                   _controllers->pitch, _controllers->roll);
-
-        // LOGGER_NOTICE_FMT("Altitude = %i Altitude US = %i", _controllers->altitude, _controllers->altitude_down);
-
-        // LOGGER_NOTICE_FMT("Battery = %i", _controllers->battery);
-
-        //   alert();
-
-        // LOGGER_NOTICE_FMT("_throttleOffset %i",_throttleOffset);  ist 0
-        //  LOGGER_NOTICE_FMT("_yawOffset %i",_yawOffset);
-
         for (byte i = 0; i < SWITCH_NUM; i++)
             switchArray[i].loop(); // MUST call the loop() function first
 
@@ -150,10 +129,14 @@ public:
             LOGGER_NOTICE("Switch 1");
         else if (switchArray[2].isPressed())
             LOGGER_NOTICE("Switch 2");
-        else if (switchArray[3].isPressed())
-            LOGGER_NOTICE("Switch 3");
 
-         //   _menuOption->set(100);  // ist getestet
+        else if (switchArray[3].isReleased())
+        {
+            switchAdjust = true;
+            LOGGER_NOTICE_FMT("Switch 3 Adjust %i", switchAdjust);
+        }
+
+        //   _menuOption->set(100);  // ist getestet
 
         for (byte i = 0; i < BUTTON_NUM; i++)
             buttonArray[i].loop(); // MUST call the loop() function first
@@ -161,23 +144,23 @@ public:
         // Vote the option ,throttle, yaw, pitch or roll
         if (buttonArray[button_e::mode].isPressed())
         {
-            mode++;
+            _mode++;
 
-            if (mode > 4)
-                mode = 1;
+            if (_mode > 4)
+                _mode = 1;
 
-            switch (mode)
+            switch (_mode)
             {
-                case 1:
+            case 1:
                 LOGGER_NOTICE("Throttle is choosen");
                 break;
-                case 2:
+            case 2:
                 LOGGER_NOTICE("Yaw is choosen");
                 break;
-                case 3:
+            case 3:
                 LOGGER_NOTICE("Pitch is choosen");
                 break;
-                case 4:
+            case 4:
                 LOGGER_NOTICE("Roll is choosen");
                 break;
             }
@@ -186,7 +169,6 @@ public:
         // Set the chosen option.
         if (buttonArray[button_e::set].isPressed())
         {
-            //_mode = count;
             LOGGER_NOTICE_FMT("Mode %i ", _mode);
         }
 
@@ -224,26 +206,18 @@ public:
             {
             case 1:
                 _throttleOffset--;
-                if (_throttleOffset < 0)
-                    _throttleOffset = 0;
                 LOGGER_NOTICE_FMT("Throttle %i", _throttleOffset);
                 break;
             case 2:
                 _yawOffset--;
-                if (_yawOffset < 0)
-                    _yawOffset = 0;
                 LOGGER_NOTICE_FMT("Yaw %i", _yawOffset);
                 break;
             case 3:
                 _pitchOffset--;
-                if (_pitchOffset < 0)
-                    _pitchOffset = 0;
                 LOGGER_NOTICE_FMT("Pitch %i", _pitchOffset);
                 break;
             case 4:
                 _rollOffset--;
-                if (_rollOffset < 0)
-                    _rollOffset = 0;
                 LOGGER_NOTICE_FMT("Roll %i", _rollOffset);
                 break;
 
@@ -270,6 +244,12 @@ public:
         else
             digitalWrite(PIN_BUZZER, LOW);
     } //---------------------- end of alert ------------------------------------------------------//
+
+    int getThrottle(){
+        LOGGER_NOTICE_FMT("getThrottle %i",_throttleOffset);
+        //return 111;
+        return _throttleOffset;  //0
+    }
 };
 
 #endif // MY_CONTROLLER_H
