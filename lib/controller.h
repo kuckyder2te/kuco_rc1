@@ -7,7 +7,7 @@
 #include <ezButton.h>
 #include "config.h"
 
-#include "..\lib\menu.h"
+//#include "..\lib\display.h"
 
 #define LOCAL_DEBUG
 #include "myLogger.h"
@@ -59,24 +59,20 @@ class Controller : public Task::Base
 
 protected:
     
-private:
-    controllers_t *_controllers;
+private:  
     button_e _button;
     switch_e _switch;
-
-    Menu *_menuOption;
  
 public:
-
+controllers_t *_controllers;
     bool switchAdjust = false;
     //bool switchYaw = false;
 
-    uint8_t _throttleOffset = 0;
-    uint8_t _yawOffset = 0;
-    uint8_t _pitchOffset = 0;
-    uint8_t _rollOffset = 0; 
+    int8_t _throttleOffset = 0;
+    int8_t _yawOffset = 0;
+    int8_t _pitchOffset = 0;
+    int8_t _rollOffset = 0; 
     
-
 public:
     Controller(const String &name)
         : Task::Base(name)
@@ -93,8 +89,6 @@ public:
 
     virtual void begin() override
     {
-        _menuOption = new Menu("menu");
-
         for (byte i = 0; i < BUTTON_NUM; i++)
         {
             buttonArray[i].setDebounceTime(50); // set debounce time to 50 milliseconds
@@ -199,6 +193,8 @@ public:
             }
         }
 
+    //    LOGGER_NOTICE_FMT("_throttleOffset after switch %i", _throttleOffset); // hier ist noch alles OK
+
         // decrease the value
         if (buttonArray[button_e::down].isPressed())
         {
@@ -244,12 +240,6 @@ public:
         else
             digitalWrite(PIN_BUZZER, LOW);
     } //---------------------- end of alert ------------------------------------------------------//
-
-    int getThrottle(){
-        LOGGER_NOTICE_FMT("getThrottle %i",_throttleOffset);
-        //return 111;
-        return _throttleOffset;  //0
-    }
 };
 
 #endif // MY_CONTROLLER_H

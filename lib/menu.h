@@ -1,5 +1,5 @@
 /*  File name : menu.h
-	Author: WilhelmKuckelsberg
+	Author: Wilhelm Kuckelsberg
 	Project name : KuCo_Phantom 1
 	Date : 2023-08-28
 	Description : 

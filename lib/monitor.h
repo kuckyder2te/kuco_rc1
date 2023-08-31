@@ -1,5 +1,5 @@
 #pragma once
-/*  File name :
+/*  File name : monitor.h
     Project name : KuCo_Phantom 1
     Author: Wilhelm Kuckelsberg
     Date : 2022-
@@ -33,13 +33,15 @@ class Monitor : public Task::Base
 
 protected:
     Adafruit_PCD8544 *_nokia;
-    Controller *_controller;
+    
 
 private:
     model_t *_model;
     unsigned long _lastMillis;
     uint16_t _display_delay;
     Report_t _report;
+    Controller *_controller;
+    int8_t __test;
 
 public:
     /// @brief Constructor
@@ -117,9 +119,9 @@ public:
             _nokia->println("Adjust");
             _nokia->display();
 
-            int test =_controller->getThrottle();
+            int test =_controller->_throttleOffset;
 
-        //    LOGGER_NOTICE_FMT("getThrottle %i", test);
+            LOGGER_NOTICE_FMT_CHK(test, __test, "getThrottle %i", test);
 
             _nokia->setTextSize(1);
             _nokia->setCursor(5, 20);
@@ -262,8 +264,5 @@ public:
 
     } /*--------------------- end of display_screen_2 -------------------------------------------*/
 
-    void set(int x){
-        LOGGER_NOTICE_FMT("Throttle %i", x);
-    }
 };
 /*------------------------- end of monitor class ------------------------------------------------*/
