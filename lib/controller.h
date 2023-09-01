@@ -5,9 +5,6 @@
 
 #include <TaskManager.h>
 #include <ezButton.h>
-#include "config.h"
-
-//#include "..\lib\display.h"
 
 #define LOCAL_DEBUG
 #include "myLogger.h"
@@ -64,7 +61,7 @@ private:
     switch_e _switch;
  
 public:
-controllers_t *_controllers;
+    controllers_t *_controllers;
     bool switchAdjust = false;
     //bool switchYaw = false;
 
@@ -105,7 +102,7 @@ public:
     {
         static uint8_t _mode = 0;
         // map is considering +/- 100 %
-        _controllers->throttle = map((analogRead(PIN_THROTTLE)), 0, 1023, -100, 100);
+        _controllers->throttle = map((analogRead(PIN_THROTTLE)), 0, 1023, -100, 100) + _throttleOffset;
         _controllers->yaw = map((analogRead(PIN_YAW)), 0, 1023, -100, 100);
         _controllers->pitch = map((analogRead(PIN_PITCH)), 0, 1023, -100, 100); // max. 15.0° must be diveded by 10 on Receiver end
         _controllers->roll = map((analogRead(PIN_ROLL)), 0, 1023, -100, 100);

@@ -22,7 +22,7 @@
 #include "..\resources\intro.h"
 
 #include "..\lib\radio.h"
-#include "..\lib\Controller.h"
+#include "..\lib\controller.h"
 #include "..\lib\model.h"
 #include "..\lib\monitor.h"
 

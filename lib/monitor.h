@@ -12,7 +12,6 @@
 #include <TaskManager.h>
 #include <print.h>
 #include <stdio.h>
-#include "config.h"
 
 #include "model.h"
 
@@ -40,7 +39,6 @@ private:
     unsigned long _lastMillis;
     uint16_t _display_delay;
     Report_t _report;
-    Controller *_controller;
     int8_t __test;
 
 public:
@@ -69,7 +67,6 @@ public:
     virtual void begin() override
     {
 
-        _controller = new Controller("controller");
         _nokia = new Adafruit_PCD8544(PIN_NOKIA_CLK, PIN_NOKIA_DIN, PIN_NOKIA_DC, PIN_NOKIA_CS, PIN_NOKIA_RST);
 
         _nokia->begin();
@@ -119,13 +116,10 @@ public:
             _nokia->println("Adjust");
             _nokia->display();
 
-            int test =_controller->_throttleOffset;
-
-            LOGGER_NOTICE_FMT_CHK(test, __test, "getThrottle %i", test);
-
+            
             _nokia->setTextSize(1);
             _nokia->setCursor(5, 20);
-            _nokia->println(test);
+            _nokia->println(_model->controllers.throttle);
             _nokia->display();
 
   //      }

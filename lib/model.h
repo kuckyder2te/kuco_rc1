@@ -7,7 +7,7 @@
 #pragma once
 
 #include "radio.h"
-#include "Controller.h"
+#include "controller.h"
 
 
 typedef struct
