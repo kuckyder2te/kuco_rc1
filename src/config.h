@@ -43,7 +43,7 @@
 #define PIN_NOKIA_CS  29
 #define PIN_NOKIA_RST 31
 
-//#define DISPLAY_DELAY 1000
+#define DISPLAY_DELAY 1000
 
 
 

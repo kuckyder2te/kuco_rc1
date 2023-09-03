@@ -77,32 +77,34 @@ public:
     {
         _nokia->clearDisplay();
 
-        _nokia->setTextSize(2);
+        _nokia->setTextSize(1);
         _nokia->setTextColor(BLACK);
-        _nokia->setCursor(0, 0);
+        _nokia->setCursor(10, 0);
         _nokia->println("Adjust JS");
         _nokia->display();
 
-        _nokia->setCursor(5, 20);
+        _nokia->setCursor(0, 10);
         _nokia->println("Throttle:");
-        _nokia->setCursor(5, 40);
+        _nokia->setCursor(60, 10);
         _nokia->println(_model->controllers.throttle);
+        _nokia->display();
 
-        _nokia->setCursor(15, 20);
+        _nokia->setCursor(0, 20);
         _nokia->println("YAW:");
-        _nokia->setCursor(15, 40);
+        _nokia->setCursor(60, 20);
         _nokia->println(_model->controllers.yaw);
+        _nokia->display();
 
-        _nokia->setCursor(20, 20);
+        _nokia->setCursor(0, 30);
         _nokia->println("Pitch:");
-        _nokia->setCursor(20, 40);
+        _nokia->setCursor(60, 30);
         _nokia->println(_model->controllers.pitch);
+        _nokia->display();
 
-        _nokia->setCursor(25, 20);
-        _nokia->println("ROLL:");
-        _nokia->setCursor(55, 40);
+        _nokia->setCursor(0, 40);
+        _nokia->println("Roll:");
+        _nokia->setCursor(60, 40);
         _nokia->println(_model->controllers.roll);
-
         _nokia->display();
 
     } /*--------------------- end of update -----------------------------------------------------*/
