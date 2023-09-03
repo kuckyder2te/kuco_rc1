@@ -21,9 +21,8 @@ typedef struct __attribute__((__packed__))
   int16_t rcThrottle;
   uint16_t rcAltitudeSonicAdj;
   uint16_t rcAltitudeBaroAdj;
-  bool rcSwi1;
-  bool rcSwi2;
-  bool rcSwi3;
+  bool rcSwi[4];
+  
 } TX_payload_t; // sendet zur Drohne
 
 typedef struct __attribute__((__packed__))
@@ -142,11 +141,12 @@ public:
     LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcYaw, debugTX_payload.rcYaw, "Yaw = %i", RC_interface->TX_payload.rcYaw);
     LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcPitch, debugTX_payload.rcPitch, "Pitch = %i", RC_interface->TX_payload.rcPitch);
     LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcRoll, debugTX_payload.rcRoll, "Roll = %i", RC_interface->TX_payload.rcRoll);
-    LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi1, debugTX_payload.rcSwi1, "Swi 1 = %i", RC_interface->TX_payload.rcSwi1);
-    LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi2, debugTX_payload.rcSwi2, "Swi 2 = %i", RC_interface->TX_payload.rcSwi2);
-    LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi3, debugTX_payload.rcSwi3, "Swi 3 = %i", RC_interface->TX_payload.rcSwi3);
-    LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi3, debugTX_payload.rcAltitudeBaroAdj, "Adjus Hoehe = %i", RC_interface->TX_payload.rcAltitudeBaroAdj);
-    LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi3, debugTX_payload.rcAltitudeSonicAdj, "Adjust Ground = %i", RC_interface->TX_payload.rcAltitudeSonicAdj);
+
+    LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi[0], debugTX_payload.rcSwi[0], "Swi 0 = %i", RC_interface->TX_payload.rcSwi[0]);
+    LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi[1], debugTX_payload.rcSwi[1], "Swi 1 = %i", RC_interface->TX_payload.rcSwi[1]);
+    
+    LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcAltitudeBaroAdj, debugTX_payload.rcAltitudeBaroAdj, "Adjus Hoehe = %i", RC_interface->TX_payload.rcAltitudeBaroAdj);
+    LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcAltitudeSonicAdj, debugTX_payload.rcAltitudeSonicAdj, "Adjust Ground = %i", RC_interface->TX_payload.rcAltitudeSonicAdj);
   }
 };
 /*------------------------- end of radio class --------------------------------------------------*/

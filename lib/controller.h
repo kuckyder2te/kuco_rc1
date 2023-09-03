@@ -23,11 +23,10 @@ typedef struct
     int altitude;
     int distance_down;
     int distance_front;
-    int swi1State, swi2State, swi3State, swi4State;
+    bool swiState[4];
     bool isThottleSet, isYawSet, isPitchSet, isRollSet;
     int8_t _throttleOffset, _yawOffset, _pitchOffset, _rollOffset;
     bool switchAdjust;
-
 } keyboard_t;
 
 typedef enum
@@ -74,8 +73,6 @@ private:
 
 public:
     keyboard_t *_keyboard;
-    
-    // bool switchYaw = false;
 
 public:
     Controller(const String &name)
@@ -98,9 +95,11 @@ public:
             buttonArray[i].setDebounceTime(50); // set debounce time to 50 milliseconds
         }
 
-        for (byte i = 0; i < SWITCH_NUM; i++)
+        for (byte i = 0; i < SWITCH_NUM; i++)  // 3 und 2 innerhalb der RC
+                                               // 1 und 0 richtung Drohne 
         {
-            switchArray[i].setDebounceTime(50); // set debounce time to 50 milliseconds
+            _keyboard->swiState[i] = switchArray[i].getState();
+            switchArray[i].setDebounceTime(50);
         }
         _keyboard->switchAdjust = false;
 

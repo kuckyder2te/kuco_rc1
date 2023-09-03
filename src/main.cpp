@@ -18,15 +18,14 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_PCD8544.h>
 #include <TaskManager.h>
+
 #include "config.h"
 #include "..\resources\intro.h"
-
 #include "..\lib\radio.h"
 #include "..\lib\controller.h"
 #include "..\lib\model.h"
 #include "..\lib\monitor.h"
 #include "..\lib\display.h"
-
 
 // #define LOCAL_DEBUG
 #include "..\lib\myLogger.h"
@@ -90,10 +89,10 @@ void main_loop()
   model.RC_interface.TX_payload.rcYaw = model.keyboard.yaw;
   model.RC_interface.TX_payload.rcPitch = model.keyboard.pitch;
   model.RC_interface.TX_payload.rcRoll = model.keyboard.roll;
-  model.RC_interface.TX_payload.rcSwi1 = model.keyboard.swi1State;
-  model.RC_interface.TX_payload.rcSwi2 = model.keyboard.swi2State;
-  model.RC_interface.TX_payload.rcSwi3 = model.keyboard.swi3State;
-  //model.RC_interface.TX_payload.rcSwi4 = model.keyboard.swi4State;
+  model.RC_interface.TX_payload.rcSwi[0] = model.keyboard.swiState[0];
+  model.RC_interface.TX_payload.rcSwi[1] = model.keyboard.swiState[1];
+  model.RC_interface.TX_payload.rcSwi[2] = model.keyboard.swiState[2];
+  model.RC_interface.TX_payload.rcSwi[3] = model.keyboard.swiState[3];
   model.RC_interface.TX_payload.rcAltitudeBaroAdj = model.keyboard.altitude;
   model.RC_interface.TX_payload.rcAltitudeSonicAdj = model.keyboard.distance_down;
   model.RC_interface.TX_payload.rcAltitudeSonicAdj = model.keyboard.distance_front;
