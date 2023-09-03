@@ -73,7 +73,7 @@ void base_setup()
 void main_setup()
 {
   Tasks.add<Radio>("radio")->setModel(&model.RC_interface)->startFps(10);
-  Tasks.add<Controller>("actuators")->setModel(&model.controllers)->startFps(10);
+  Tasks.add<Controller>("actuators")->setModel(&model.keyboard)->startFps(10);
   //Tasks.add<Monitor>("Monitor")->setModel(&model)->startFps(10);
   Tasks.add<Display>("Display")->setModel(&model)->startFps(10);
   Serial.println("setup done");
@@ -86,29 +86,29 @@ void main_loop()
   Tasks.update();
   digitalWrite(LED_MAINLOOP, LOW);
 
-  model.RC_interface.TX_payload.rcThrottle = model.controllers.throttle;
-  model.RC_interface.TX_payload.rcYaw = model.controllers.yaw;
-  model.RC_interface.TX_payload.rcPitch = model.controllers.pitch;
-  model.RC_interface.TX_payload.rcRoll = model.controllers.roll;
-  model.RC_interface.TX_payload.rcSwi1 = model.controllers.swi1State;
-  model.RC_interface.TX_payload.rcSwi2 = model.controllers.swi2State;
-  model.RC_interface.TX_payload.rcSwi3 = model.controllers.swi3State;
-  //model.RC_interface.TX_payload.rcSwi4 = model.controllers.swi4State;
-  model.RC_interface.TX_payload.rcAltitudeBaroAdj = model.controllers.altitude;
-  model.RC_interface.TX_payload.rcAltitudeSonicAdj = model.controllers.distance_down;
-  model.RC_interface.TX_payload.rcAltitudeSonicAdj = model.controllers.distance_front;
+  model.RC_interface.TX_payload.rcThrottle = model.keyboard.throttle;
+  model.RC_interface.TX_payload.rcYaw = model.keyboard.yaw;
+  model.RC_interface.TX_payload.rcPitch = model.keyboard.pitch;
+  model.RC_interface.TX_payload.rcRoll = model.keyboard.roll;
+  model.RC_interface.TX_payload.rcSwi1 = model.keyboard.swi1State;
+  model.RC_interface.TX_payload.rcSwi2 = model.keyboard.swi2State;
+  model.RC_interface.TX_payload.rcSwi3 = model.keyboard.swi3State;
+  //model.RC_interface.TX_payload.rcSwi4 = model.keyboard.swi4State;
+  model.RC_interface.TX_payload.rcAltitudeBaroAdj = model.keyboard.altitude;
+  model.RC_interface.TX_payload.rcAltitudeSonicAdj = model.keyboard.distance_down;
+  model.RC_interface.TX_payload.rcAltitudeSonicAdj = model.keyboard.distance_front;
   if (millis() - _lastMillis > 1000)
   {
     _lastMillis = millis();
 
-    LOGGER_NOTICE_FMT("Throttle = %i Yaw = %i Pitch = %i Roll %i,", (uint16_t)model.controllers.throttle,
-                      (uint16_t)model.controllers.yaw,
-                      (uint16_t)model.controllers.pitch,
-                      (uint16_t)model.controllers.roll);
+    LOGGER_NOTICE_FMT("Throttle = %i Yaw = %i Pitch = %i Roll %i,", (uint16_t)model.keyboard.throttle,
+                      (uint16_t)model.keyboard.yaw,
+                      (uint16_t)model.keyboard.pitch,
+                      (uint16_t)model.keyboard.roll);
 
-    LOGGER_NOTICE_FMT("Swi 1 = %i Swi2 = %i Swi3 = %i,", (uint16_t)model.controllers.swi1State,
-                      (uint16_t)model.controllers.swi2State,
-                      (uint16_t)model.controllers.swi3State);
+    LOGGER_NOTICE_FMT("Swi 1 = %i Swi2 = %i Swi3 = %i,", (uint16_t)model.keyboard.swi1State,
+                      (uint16_t)model.keyboard.swi2State,
+                      (uint16_t)model.keyboard.swi3State);
 
     LOGGER_NOTICE_FMT("Altitude = %i Ground = %i Front = %i,", (uint16_t)model.RC_interface.RX_payload.altitude,
                       (uint16_t)model.RC_interface.RX_payload.distance_down,

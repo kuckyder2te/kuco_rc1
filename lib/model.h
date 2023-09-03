@@ -12,6 +12,6 @@
 
 typedef struct
 {
-    controllers_t controllers;
+    keyboard_t keyboard;
     RC_interface_t RC_interface;
 } model_t;

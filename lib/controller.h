@@ -1,5 +1,12 @@
-
 #pragma once
+/*  File name : controller.h
+    Project name : KuCo_Phantom 1
+    Author: Wilhelm Kuckelsberg
+    Date : 2023-09-03
+
+    Description : RC
+
+*/
 #ifndef MY_SENSORS_H
 #define MY_SENSORS_H
 
@@ -21,7 +28,7 @@ typedef struct
     int8_t _throttleOffset, _yawOffset, _pitchOffset, _rollOffset;
     bool switchAdjust;
 
-} controllers_t;
+} keyboard_t;
 
 typedef enum
 {
@@ -59,14 +66,14 @@ class Controller : public Task::Base
 {
 
 protected:
-controllers_t __controllers;
+keyboard_t __keyboard;
 
 private:
     button_e _button;
     switch_e _switch;
 
 public:
-    controllers_t *_controllers;
+    keyboard_t *_keyboard;
     
     // bool switchYaw = false;
 
@@ -76,10 +83,10 @@ public:
     {
     }
 
-    Controller *setModel(controllers_t *_model)
+    Controller *setModel(keyboard_t *_model)
     {
         LOGGER_VERBOSE("Enter....");
-        _controllers = _model;
+        _keyboard = _model;
         LOGGER_VERBOSE("....leave");
         return this;
     }
@@ -95,7 +102,7 @@ public:
         {
             switchArray[i].setDebounceTime(50); // set debounce time to 50 milliseconds
         }
-        _controllers->switchAdjust = false;
+        _keyboard->switchAdjust = false;
 
     } //---------------------- end of begin -----------------------------------------------//
 
@@ -104,16 +111,16 @@ public:
         static uint8_t _chooseJS = 0;
         static uint8_t _isJS = 0;
         // map is considering +/- 100 %
-        _controllers->throttle = map((analogRead(PIN_THROTTLE)), 0, 1023, -100, 100) + _controllers->_throttleOffset;
-        LOGGER_NOTICE_FMT_CHK(_controllers->throttle, __controllers.throttle, "Throttle: %i", _controllers->throttle);
-        _controllers->yaw = map((analogRead(PIN_YAW)), 0, 1023, -100, 100) + _controllers->_yawOffset;
-        _controllers->pitch = map((analogRead(PIN_PITCH)), 0, 1023, -15, 15) + _controllers->_pitchOffset;
-        _controllers->roll = map((analogRead(PIN_ROLL)), 0, 1023, -15, 15 + _controllers->_rollOffset);
+        _keyboard->throttle = map((analogRead(PIN_THROTTLE)), 0, 1023, -100, 100) + _keyboard->_throttleOffset;
+        LOGGER_NOTICE_FMT_CHK(_keyboard->throttle, __keyboard.throttle, "Throttle: %i", _keyboard->throttle);
+        _keyboard->yaw = map((analogRead(PIN_YAW)), 0, 1023, -100, 100) + _keyboard->_yawOffset;
+        _keyboard->pitch = map((analogRead(PIN_PITCH)), 0, 1023, -15, 15) + _keyboard->_pitchOffset;
+        _keyboard->roll = map((analogRead(PIN_ROLL)), 0, 1023, -15, 15 + _keyboard->_rollOffset);
 
-        _controllers->altitude = map((analogRead(PIN_ALTITUDE)), 0, 1013, 0, 100);
-        _controllers->distance_down = map(analogRead(PIN_DISTANCE_DOWN), 0, 1023, 0, 200);
-        // _controllers->battery = map(analogRead(PIN_BATTERY), 0, 1023, 0, 100);
-        // _controllers->battery = analogRead(PIN_BATTERY);
+        _keyboard->altitude = map((analogRead(PIN_ALTITUDE)), 0, 1013, 0, 100);
+        _keyboard->distance_down = map(analogRead(PIN_DISTANCE_DOWN), 0, 1023, 0, 200);
+        // _keyboard->battery = map(analogRead(PIN_BATTERY), 0, 1023, 0, 100);
+        // _keyboard->battery = analogRead(PIN_BATTERY);
 
         for (byte i = 0; i < SWITCH_NUM; i++)
             switchArray[i].loop(); // MUST call the loop() function first
@@ -127,11 +134,11 @@ public:
 
         else if (switchArray[3].isReleased())
         {
-            _controllers->switchAdjust = true;
-            LOGGER_NOTICE_FMT("Switch 3 Adjust %i", _controllers->switchAdjust);
+            _keyboard->switchAdjust = true;
+            LOGGER_NOTICE_FMT("Switch 3 Adjust %i", _keyboard->switchAdjust);
         }
 
-        if (_controllers->switchAdjust)
+        if (_keyboard->switchAdjust)
         {
             for (byte i = 0; i < BUTTON_NUM; i++)
                 buttonArray[i].loop(); // MUST call the loop() function first
@@ -147,31 +154,31 @@ public:
                 switch (_chooseJS)
                 {
                 case 1:
-                    _controllers->isThottleSet = true;
-                    _controllers->isYawSet = false;
-                    _controllers->isPitchSet = false;
-                    _controllers->isRollSet = false;
+                    _keyboard->isThottleSet = true;
+                    _keyboard->isYawSet = false;
+                    _keyboard->isPitchSet = false;
+                    _keyboard->isRollSet = false;
                     LOGGER_NOTICE("Throttle is set");
                     break;
                 case 2:
-                    _controllers->isThottleSet = false;
-                    _controllers->isYawSet = true;
-                    _controllers->isPitchSet = false;
-                    _controllers->isRollSet = false;
+                    _keyboard->isThottleSet = false;
+                    _keyboard->isYawSet = true;
+                    _keyboard->isPitchSet = false;
+                    _keyboard->isRollSet = false;
                     LOGGER_NOTICE("Yaw is set");
                     break;
                 case 3:
-                    _controllers->isThottleSet = false;
-                    _controllers->isYawSet = false;
-                    _controllers->isPitchSet = true;
-                    _controllers->isRollSet = false;
+                    _keyboard->isThottleSet = false;
+                    _keyboard->isYawSet = false;
+                    _keyboard->isPitchSet = true;
+                    _keyboard->isRollSet = false;
                     LOGGER_NOTICE("Pitch is set");
                     break;
                 case 4:
-                    _controllers->isThottleSet = false;
-                    _controllers->isYawSet = false;
-                    _controllers->isPitchSet = false;
-                    _controllers->isRollSet = true;
+                    _keyboard->isThottleSet = false;
+                    _keyboard->isYawSet = false;
+                    _keyboard->isPitchSet = false;
+                    _keyboard->isRollSet = true;
                     LOGGER_NOTICE("Roll is set");
                     break;
                 }
@@ -201,21 +208,21 @@ public:
                 switch (_isJS)
                 {
                 case 0:
-                    _controllers->_throttleOffset++;
-                    LOGGER_NOTICE_FMT("_throttleOffset++ %i", _controllers->_throttleOffset);
-                    LOGGER_NOTICE_FMT(" Real throttle: %i", _controllers->throttle);
+                    _keyboard->_throttleOffset++;
+                    LOGGER_NOTICE_FMT("_throttleOffset++ %i", _keyboard->_throttleOffset);
+                    LOGGER_NOTICE_FMT(" Real throttle: %i", _keyboard->throttle);
                     break;
                 case 1:
-                    _controllers->_yawOffset++;
-                    LOGGER_NOTICE_FMT("_yawOffset++ %i", _controllers->_yawOffset);
+                    _keyboard->_yawOffset++;
+                    LOGGER_NOTICE_FMT("_yawOffset++ %i", _keyboard->_yawOffset);
                     break;
                 case 2:
-                    _controllers->_pitchOffset++;
-                    LOGGER_NOTICE_FMT("_pitchOffset++ %i", _controllers->_pitchOffset);
+                    _keyboard->_pitchOffset++;
+                    LOGGER_NOTICE_FMT("_pitchOffset++ %i", _keyboard->_pitchOffset);
                     break;
                 case 3:
-                    _controllers->_rollOffset++;
-                    LOGGER_NOTICE_FMT("_rollOffset++ %i", _controllers->_rollOffset);
+                    _keyboard->_rollOffset++;
+                    LOGGER_NOTICE_FMT("_rollOffset++ %i", _keyboard->_rollOffset);
                     break;
 
                 default:
@@ -228,20 +235,20 @@ public:
                 switch (_isJS)
                 {
                 case 1:
-                    _controllers->_throttleOffset--;
-                    LOGGER_NOTICE_FMT("Throttle %i", _controllers->_throttleOffset);
+                    _keyboard->_throttleOffset--;
+                    LOGGER_NOTICE_FMT("Throttle %i", _keyboard->_throttleOffset);
                     break;
                 case 2:
-                    _controllers->_yawOffset--;
-                    LOGGER_NOTICE_FMT("Yaw %i", _controllers->_yawOffset);
+                    _keyboard->_yawOffset--;
+                    LOGGER_NOTICE_FMT("Yaw %i", _keyboard->_yawOffset);
                     break;
                 case 3:
-                    _controllers->_pitchOffset--;
-                    LOGGER_NOTICE_FMT("Pitch %i", _controllers->_pitchOffset);
+                    _keyboard->_pitchOffset--;
+                    LOGGER_NOTICE_FMT("Pitch %i", _keyboard->_pitchOffset);
                     break;
                 case 4:
-                    _controllers->_rollOffset--;
-                    LOGGER_NOTICE_FMT("Roll %i", _controllers->_rollOffset);
+                    _keyboard->_rollOffset--;
+                    LOGGER_NOTICE_FMT("Roll %i", _keyboard->_rollOffset);
                     break;
 
                 default:
@@ -249,14 +256,14 @@ public:
                 }
             }
         }
-        // _controllers.battery = analogRead(PIN_BATTERY);
-        // LOGGER_NOTICE_FMT("Battery has %i Volt",_controllers.battery);
+        // _keyboard.battery = analogRead(PIN_BATTERY);
+        // LOGGER_NOTICE_FMT("Battery has %i Volt",_keyboard.battery);
     } //---------------------- end of update ------------------------------------------------------//
 
     void alert()
     {
         int lastMillis = millis();
-        if (_controllers->battery > 50)
+        if (_keyboard->battery > 50)
             if (millis() - lastMillis > 1000)
             {
                 digitalWrite(PIN_BUZZER, HIGH);
