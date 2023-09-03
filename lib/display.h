@@ -17,14 +17,13 @@
 #define LOCAL_DEBUG
 #include "myLogger.h"
 
-
 class Display : public Task::Base
 {
 
 protected:
     Adafruit_PCD8544 *_nokia;
-//    Display *_display;
-    
+    //    Display *_nokia;
+
 private:
     model_t *_model;
     unsigned long _lastMillis;
@@ -37,15 +36,14 @@ public:
     Display(const String &name)
         : Task::Base(name)
     {
- 
     }
     /// @brief
-    /// @param _mod
+    /// @param _model
     /// @return Reference of himself for multiple function call
-    Display *setModel(model_t *_mod)
+    Display *setModel(model_t *_model)
     { // Rückgabe wert ist das eigene Objekt (this)
         LOGGER_VERBOSE("Enter....");
-        _model = _mod;
+        _model = _model;
         LOGGER_VERBOSE("....leave");
         return this;
     } /*--------------------- end of setModel --------------------------------------------------*/
@@ -54,45 +52,58 @@ public:
     {
         _nokia = new Adafruit_PCD8544(PIN_NOKIA_CLK, PIN_NOKIA_DIN, PIN_NOKIA_DC, PIN_NOKIA_CS, PIN_NOKIA_RST);
 
-        // _nokia->begin();
-        // _nokia->setContrast(60);
-        // _nokia->display();
-        // delay(100);
-        // _nokia->clearDisplay();
-        
-        // _nokia->display();
+        _nokia->begin();
+        _nokia->setContrast(60);
+        _nokia->display();
+        delay(100);
+        _nokia->clearDisplay();
 
-        // _nokia->display();
-        // _nokia->setTextSize(2);
-        // _nokia->setTextColor(BLACK);
-        // _nokia->setCursor(0, 0);
-        // _nokia->println("Kucky");
-        // _nokia->setCursor(10, 25);
-        // _nokia->println("Copter");
-        // _nokia->display();
-        // delay(2000);
-        // _nokia->clearDisplay();
+        _nokia->display();
+
+        _nokia->display();
+        _nokia->setTextSize(2);
+        _nokia->setTextColor(BLACK);
+        _nokia->setCursor(0, 0);
+        _nokia->println("Kucky");
+        _nokia->setCursor(10, 25);
+        _nokia->println("Copter");
+        _nokia->display();
+        delay(2000);
+        _nokia->clearDisplay();
 
     } /*--------------------- end of begin -----------------------------------------------------*/
 
     virtual void update() override
     {
-            // _nokia->clearDisplay();
+        _nokia->clearDisplay();
 
-            // _nokia->setTextSize(2);
-            // _nokia->setTextColor(BLACK);
-            // _nokia->setCursor(0, 0);
-            // _nokia->println("Adjust");
-            // _nokia->display();
+        _nokia->setTextSize(2);
+        _nokia->setTextColor(BLACK);
+        _nokia->setCursor(0, 0);
+        _nokia->println("Adjust JS");
+        _nokia->display();
 
-            // int test =_controller->_throttleOffset;
+        _nokia->setCursor(5, 20);
+        _nokia->println("Throttle:");
+        _nokia->setCursor(5, 40);
+        _nokia->println(_model->controllers.throttle);
 
-            // LOGGER_NOTICE_FMT_CHK(test, __test, "getThrottle %i", test);
+        _nokia->setCursor(15, 20);
+        _nokia->println("YAW:");
+        _nokia->setCursor(15, 40);
+        _nokia->println(_model->controllers.yaw);
 
-            // _nokia->setTextSize(1);
-            // _nokia->setCursor(5, 20);
-            // _nokia->println(test);
-            // _nokia->display();
+        _nokia->setCursor(20, 20);
+        _nokia->println("Pitch:");
+        _nokia->setCursor(20, 40);
+        _nokia->println(_model->controllers.pitch);
+
+        _nokia->setCursor(25, 20);
+        _nokia->println("ROLL:");
+        _nokia->setCursor(55, 40);
+        _nokia->println(_model->controllers.roll);
+
+        _nokia->display();
 
     } /*--------------------- end of update -----------------------------------------------------*/
 };

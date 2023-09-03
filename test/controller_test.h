@@ -20,8 +20,10 @@ void test_setup()
 
 void test_loop()
 {
+  digitalWrite(LED_MAINLOOP, LOW);
   controller->update();
   monitor->update();
+  digitalWrite(LED_MAINLOOP, HIGH);
 }
 /*--------------------------- end of controller test function -----------------------------------*/
 

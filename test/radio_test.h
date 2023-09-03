@@ -24,6 +24,7 @@ void test_setup()
 
 void test_loop()
 {
+  digitalWrite(LED_MAINLOOP, LOW);
   digitalWrite(LED_RADIO, LOW);
   radio->update();
   monitor->update();
@@ -37,8 +38,9 @@ void test_loop()
   model.RC_interface.TX_payload.rcSwi2 = model.controllers.swi2State;
   model.RC_interface.TX_payload.rcSwi3 = model.controllers.swi3State;
   model.RC_interface.TX_payload.rcAltitudeBaroAdj = model.controllers.altitude;
-  model.RC_interface.TX_payload.rcAltitudeSonicAdj = model.controllers.altitude_down;
+  model.RC_interface.TX_payload.rcAltitudeSonicAdj = model.controllers.distance_down;
   digitalWrite(LED_RADIO, HIGH);
+  digitalWrite(LED_MAINLOOP, HIGH);
   delay(100);
 }
 /*--------------------------- end of radio test function ----------------------------------------*/

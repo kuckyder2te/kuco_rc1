@@ -10,7 +10,7 @@
 #define PIN_ROLL     A6
 
 #define PIN_ALTITUDE       A8
-#define PIN_ALTITUDE_DOWN A10
+#define PIN_DISTANCE_DOWN  A10
 
 #define BUTTON_NUM 5
 #define SWITCH_NUM 4
@@ -43,7 +43,7 @@
 #define PIN_NOKIA_CS  29
 #define PIN_NOKIA_RST 31
 
-#define DISPLAY_DELAY 1000
+//#define DISPLAY_DELAY 1000
 
 
 

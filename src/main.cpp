@@ -25,6 +25,8 @@
 #include "..\lib\controller.h"
 #include "..\lib\model.h"
 #include "..\lib\monitor.h"
+#include "..\lib\display.h"
+
 
 // #define LOCAL_DEBUG
 #include "..\lib\myLogger.h"
@@ -73,7 +75,7 @@ void main_setup()
   Tasks.add<Radio>("radio")->setModel(&model.RC_interface)->startFps(10);
   Tasks.add<Controller>("actuators")->setModel(&model.controllers)->startFps(10);
   Tasks.add<Monitor>("Monitor")->setModel(&model)->startFps(10);
-
+  Tasks.add<Display>("Monitor")->setModel(&model)->startFps(10);
   Serial.println("setup done");
 }
 
@@ -93,7 +95,8 @@ void main_loop()
   model.RC_interface.TX_payload.rcSwi3 = model.controllers.swi3State;
   //model.RC_interface.TX_payload.rcSwi4 = model.controllers.swi4State;
   model.RC_interface.TX_payload.rcAltitudeBaroAdj = model.controllers.altitude;
-  model.RC_interface.TX_payload.rcAltitudeSonicAdj = model.controllers.altitude_down;
+  model.RC_interface.TX_payload.rcAltitudeSonicAdj = model.controllers.distance_down;
+  model.RC_interface.TX_payload.rcAltitudeSonicAdj = model.controllers.distance_front;
   if (millis() - _lastMillis > 1000)
   {
     _lastMillis = millis();
