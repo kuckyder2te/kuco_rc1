@@ -74,8 +74,8 @@ void main_setup()
 {
   Tasks.add<Radio>("radio")->setModel(&model.RC_interface)->startFps(10);
   Tasks.add<Controller>("actuators")->setModel(&model.controllers)->startFps(10);
-  Tasks.add<Monitor>("Monitor")->setModel(&model)->startFps(10);
-  Tasks.add<Display>("Monitor")->setModel(&model)->startFps(10);
+  //Tasks.add<Monitor>("Monitor")->setModel(&model)->startFps(10);
+  Tasks.add<Display>("Display")->setModel(&model)->startFps(10);
   Serial.println("setup done");
 }
 

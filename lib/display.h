@@ -22,11 +22,13 @@ class Display : public Task::Base
 
 protected:
     Adafruit_PCD8544 *_nokia;
-    //    Display *_nokia;
 
 private:
     model_t *_model;
     unsigned long _lastMillis;
+
+public:
+    controllers_t *_controllers;
 
 public:
     /// @brief Constructor
@@ -40,10 +42,10 @@ public:
     /// @brief
     /// @param _model
     /// @return Reference of himself for multiple function call
-    Display *setModel(model_t *_model)
+    Display *setModel(model_t *model)
     { // Rückgabe wert ist das eigene Objekt (this)
         LOGGER_VERBOSE("Enter....");
-        _model = _model;
+        _model = model;
         LOGGER_VERBOSE("....leave");
         return this;
     } /*--------------------- end of setModel --------------------------------------------------*/
@@ -74,6 +76,15 @@ public:
     } /*--------------------- end of begin -----------------------------------------------------*/
 
     virtual void update() override
+    {
+        if (_controllers->switchAdjust)
+        {
+            adjust_screen();
+        }
+
+    } /*--------------------- end of update -----------------------------------------------------*/
+
+    void adjust_screen()
     {
         _nokia->clearDisplay();
 
@@ -106,7 +117,6 @@ public:
         _nokia->setCursor(60, 40);
         _nokia->println(_model->controllers.roll);
         _nokia->display();
-
-    } /*--------------------- end of update -----------------------------------------------------*/
+    }
 };
 /*------------------------- end of monitor class ------------------------------------------------*/
