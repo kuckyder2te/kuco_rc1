@@ -21,10 +21,10 @@
 #define PIN_BUTTON_4 A14
 #define PIN_BUTTON_5 A12
 
-#define PIN_SWITCH_1 40   // Switch Controller
-#define PIN_SWITCH_2 42
-#define PIN_SWITCH_3 44
-#define PIN_SWITCH_4 46
+#define PIN_SWITCH_0 40   // Switch Controller
+#define PIN_SWITCH_1 42
+#define PIN_SWITCH_2 44
+#define PIN_SWITCH_3 46
 
 #define PIN_BUZZER   10
 

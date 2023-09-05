@@ -61,8 +61,6 @@ public:
         _nokia->clearDisplay();
 
         _nokia->display();
-
-        _nokia->display();
         _nokia->setTextSize(2);
         _nokia->setTextColor(BLACK);
         _nokia->setCursor(0, 0);
@@ -77,9 +75,14 @@ public:
 
     virtual void update() override
     {
-        if (_keyboard->switchAdjust)
+        if (_keyboard->swiState[3] == 1) 
         {
+            Serial.println("Display update");
             adjust_screen();
+        }
+        else
+        {
+            print_FlyScreen();
         }
 
     } /*--------------------- end of update -----------------------------------------------------*/
@@ -117,6 +120,41 @@ public:
         _nokia->setCursor(60, 40);
         _nokia->println(_model->keyboard.roll);
         _nokia->display();
-    }
+    } //---------------------- end of adjust_screen ------------------------------------------------------//
+
+    void print_FlyScreen()
+    {
+            _nokia->clearDisplay();
+
+        _nokia->setTextSize(1);
+        _nokia->setTextColor(BLACK);
+        _nokia->setCursor(10, 0);
+        _nokia->println("Flyscreen");
+        _nokia->display();
+
+        _nokia->setCursor(0, 10);
+        _nokia->println("Throttle:");
+        _nokia->setCursor(60, 10);
+        _nokia->println(_model->RC_interface.RX_payload.altitude); 
+        _nokia->display();
+
+        _nokia->setCursor(0, 20);
+        _nokia->println("YAW:");
+        _nokia->setCursor(60, 20);
+        _nokia->println(_model->RC_interface.TX_payload.rcAltitudeSonicAdj);
+        _nokia->display();
+
+        _nokia->setCursor(0, 30);
+        _nokia->println("Pitch:");
+        _nokia->setCursor(60, 30);
+        _nokia->println(_model->keyboard.pitch);
+        _nokia->display();
+
+        _nokia->setCursor(0, 40);
+        _nokia->println("Roll:");
+        _nokia->setCursor(60, 40);
+        _nokia->println(_model->keyboard.roll);
+        _nokia->display();
+    } //---------------------- end of printFlyScreen ------------------------------------------------------//
 };
 /*------------------------- end of display class ------------------------------------------------*/

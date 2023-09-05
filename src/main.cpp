@@ -22,7 +22,7 @@
 #include "config.h"
 #include "..\resources\intro.h"
 #include "..\lib\radio.h"
-#include "..\lib\controller.h"
+#include "..\lib\keyboard.h"
 #include "..\lib\model.h"
 #include "..\lib\monitor.h"
 #include "..\lib\display.h"
@@ -72,7 +72,7 @@ void base_setup()
 void main_setup()
 {
   Tasks.add<Radio>("radio")->setModel(&model.RC_interface)->startFps(10);
-  Tasks.add<Controller>("actuators")->setModel(&model.keyboard)->startFps(10);
+  Tasks.add<Keyboard>("keyboard")->setModel(&model.keyboard)->startFps(10);
   //Tasks.add<Monitor>("Monitor")->setModel(&model)->startFps(10);
   Tasks.add<Display>("Display")->setModel(&model)->startFps(10);
   Serial.println("setup done");

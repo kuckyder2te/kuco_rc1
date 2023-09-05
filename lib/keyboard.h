@@ -66,34 +66,25 @@ typedef struct
     bool swiState[4];
     bool isThottleSet, isYawSet, isPitchSet, isRollSet;
     int8_t _throttleOffset, _yawOffset, _pitchOffset, _rollOffset;
-    // bool switchAdjust;
-    // bool switchNN;
-    // bool switchAutonom;
-    // bool switchHoldAltitude;
-    //   ezButton switchArray[4];
 } keyboard_t;
 
-class Controller : public Task::Base
+class Keyboard : public Task::Base
 {
 
 protected:
     keyboard_t __keyboard;
 
 private:
-    button_e _button;
-    switch_e _switch;
-
 public:
     keyboard_t *_keyboard;
-    // test_t *_test;
 
 public:
-    Controller(const String &name)
+    Keyboard(const String &name)
         : Task::Base(name)
     {
     }
 
-    Controller *setModel(keyboard_t *_model)
+    Keyboard *setModel(keyboard_t *_model)
     {
         LOGGER_VERBOSE("Enter....");
         _keyboard = _model;
@@ -111,42 +102,50 @@ public:
         {
             switchArray[i].setDebounceTime(50);
         }
-        //    switchArray[i].loop(); // MUST call the loop() function first
-
-        // _test->switchArray[0] = ezButton(PIN_SWITCH_0); // 1 und 0 richtung Drohne
-        // _test->switchArray[1] = ezButton(PIN_SWITCH_1);
-        // _test->switchArray[2] = ezButton(PIN_SWITCH_2); // 3 und 2 innerhalb der RC
-        // _test->switchArray[3] = ezButton(PIN_SWITCH_3);
-
-        // for (byte i = 0; i < SWITCH_NUM; i++)
-        // {
-        //     _keyboard->swiState[i] = _test->switchArray[i].getState();
-        //     LOGGER_NOTICE_FMT("Switch state %i %i", i, _test->switchArray[i].getState());
-
-        // }
-
-        // if (_keyboard->swiState[2])
-        // {
-        //     _keyboard->switchAdjust = false;
-        // }
-        // else if (_keyboard->swiState[3])
-        // {
-        //     _keyboard->switchAutonom = false;
-        // }
-
-        // for (byte i = 0; i < SWITCH_NUM; i++)
-        // {
-        //     _keyboard->swiState[i] = switchArray[i].getState();
-        //     LOGGER_NOTICE_FMT("Switch state %i ", _keyboard->swiState[i]);
-        // }
 
     } //---------------------- end of begin -----------------------------------------------//
 
     virtual void update() override
     {
-        static uint8_t _chooseJS = 0;
-        static uint8_t _isJS = 0;
+        readJoyStick();
+        readModeSwitch();
         getSwitchState();
+        readAdjustButtons();
+
+        // _keyboard.battery = analogRead(PIN_BATTERY);
+        // LOGGER_NOTICE_FMT("Battery has %i Volt",_keyboard->battery);
+    } //---------------------- end of update ------------------------------------------------------//
+
+    void alert()
+    {
+        int lastMillis = millis();
+        if (_keyboard->battery > 50)
+            if (millis() - lastMillis > 1000)
+            {
+                digitalWrite(PIN_BUZZER, HIGH);
+                lastMillis = millis();
+            }
+            else
+                digitalWrite(PIN_BUZZER, LOW);
+        else
+            digitalWrite(PIN_BUZZER, LOW);
+    } //---------------------- end of alert ------------------------------------------------------//
+
+    void getSwitchState()
+    {
+        for (byte i = 0; i < SWITCH_NUM; i++)
+            switchArray[i].loop(); // MUST call the loop() function first
+
+        for (byte i = 0; i < SWITCH_NUM; i++)
+        {
+            _keyboard->swiState[i] = switchArray[i].getState();
+            LOGGER_NOTICE_FMT("Switch state %i ", _keyboard->swiState[i]);
+        }
+        delay(1000);
+    } //---------------------- end of getSwitchState ---------------------------------------------//
+
+    void readJoyStick()
+    {
         // map is considering +/- 100 %
         _keyboard->throttle = map((analogRead(PIN_THROTTLE)), 0, 1023, -100, 100) + _keyboard->_throttleOffset;
         LOGGER_NOTICE_FMT_CHK(_keyboard->throttle, __keyboard.throttle, "Throttle: %i", _keyboard->throttle);
@@ -158,33 +157,12 @@ public:
         _keyboard->distance_down = map(analogRead(PIN_DISTANCE_DOWN), 0, 1023, 0, 200);
         // _keyboard->battery = map(analogRead(PIN_BATTERY), 0, 1023, 0, 100);
         //_keyboard->battery = analogRead(PIN_BATTERY);
+    } //---------------------- end of readJoyStick ----------------------------------------------//
 
-        for (byte i = 0; i < SWITCH_NUM; i++)
-            switchArray[i].loop(); // MUST call the loop() function first
-
-        if (switchArray[0].isPressed())
-        {
-            _keyboard->swiState[0] = true;
-            LOGGER_NOTICE("Switch 0 Autonom");
-        }
-
-        else if (switchArray[1].isPressed())
-        {
-            _keyboard->swiState[1] = true;
-            LOGGER_NOTICE("Switch 1 Hold Altitude");
-        }
-
-        else if (switchArray[2].isPressed())
-        {
-            _keyboard->swiState[2] = true;
-            LOGGER_NOTICE("Switch 2 NN");
-        }
-
-        else if (switchArray[3].isReleased())
-        {
-            _keyboard->swiState[3] = true;
-            LOGGER_NOTICE_FMT("Switch 3 Adjust %i", _keyboard->swiState[3]);
-        }
+    void readAdjustButtons()
+    {
+        static uint8_t _chooseJS = 0;
+        static uint8_t _isJS = 0;
 
         if (_keyboard->swiState[3])
         {
@@ -304,37 +282,38 @@ public:
                 }
             }
         }
-        // _keyboard.battery = analogRead(PIN_BATTERY);
-        // LOGGER_NOTICE_FMT("Battery has %i Volt",_keyboard->battery);
-    } //---------------------- end of update ------------------------------------------------------//
+    } //---------------------- end of readAdjustButtons -----------------------------------------//
 
-    void alert()
-    {
-        int lastMillis = millis();
-        if (_keyboard->battery > 50)
-            if (millis() - lastMillis > 1000)
-            {
-                digitalWrite(PIN_BUZZER, HIGH);
-                lastMillis = millis();
-            }
-            else
-                digitalWrite(PIN_BUZZER, LOW);
-        else
-            digitalWrite(PIN_BUZZER, LOW);
-    } //---------------------- end of alert ------------------------------------------------------//
-
-    void getSwitchState()
+    void readModeSwitch()
     {
         for (byte i = 0; i < SWITCH_NUM; i++)
             switchArray[i].loop(); // MUST call the loop() function first
 
-        for (byte i = 0; i < SWITCH_NUM; i++)
+        if (switchArray[0].isPressed())
         {
-            _keyboard->swiState[i] = switchArray[i].getState();
-            LOGGER_NOTICE_FMT("Switch state %i ", _keyboard->swiState[i]);
+            _keyboard->swiState[0] = true;
+            LOGGER_NOTICE("Switch 0 Autonom");
         }
-        delay(1000);
-    } //---------------------- end of getSwitchState ---------------------------------------------//
-};
 
+        else if (switchArray[1].isPressed())
+        {
+            _keyboard->swiState[1] = true;
+            LOGGER_NOTICE("Switch 1 Hold Altitude");
+        }
+
+        else if (switchArray[2].isPressed())
+        {
+            _keyboard->swiState[2] = true;
+            LOGGER_NOTICE("Switch 2 NN");
+        }
+
+        else if (switchArray[3].isReleased())
+        {
+            _keyboard->swiState[3] = true;
+            LOGGER_NOTICE_FMT("Switch 3 Adjust %i", _keyboard->swiState[3]);
+        }
+
+    } //---------------------- end of readModeSwitch --------------------------------------------//
+};
+/*--------------------------- end of keyboard class ---------------------------------------------*/
 #endif // MY_CONTROLLER_H
