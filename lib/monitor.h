@@ -86,9 +86,9 @@ public:
             case RADIO:
                 Serial.println("RC RADIO");
                 sprintf(strBuf, "/*%i, %i, %i, %i, %i, %i, %i, %i, %i, %i*/\r\n",
-                        (int16_t)_model->RC_interface.RX_payload.yaw,
-                        (int16_t)_model->RC_interface.RX_payload.pitch,
-                        (int16_t)_model->RC_interface.RX_payload.roll,
+                        _model->RC_interface.RX_payload.yaw,
+                        _model->RC_interface.RX_payload.secondaryAxis,
+                        _model->RC_interface.RX_payload.primaryAxis,
                         _model->RC_interface.RX_payload.altitude,
                         _model->RC_interface.RX_payload.distance_down,
                         _model->RC_interface.RX_payload.distance_front,

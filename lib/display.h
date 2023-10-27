@@ -11,10 +11,11 @@
 #include <Arduino.h>
 #include <TaskManager.h>
 #include "config.h"
+#include "def.h"
 
 #include "..\lib\model.h"
 
-#define LOCAL_DEBUG
+//#define LOCAL_DEBUG
 #include "myLogger.h"
 
 class Display : public Task::Base
@@ -75,13 +76,14 @@ public:
 
     virtual void update() override
     {
-        if (_keyboard->swiState[3] == 1) 
+        if (_keyboard->swiState[switch_e::adjust_on])
         {
-            Serial.println("Display update");
+            LOGGER_NOTICE("Display adjust screen");
             adjust_screen();
         }
         else
         {
+            LOGGER_NOTICE("Display fly screen");
             print_FlyScreen();
         }
 

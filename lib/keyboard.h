@@ -13,10 +13,11 @@
 #include <TaskManager.h>
 #include <ezButton.h>
 
-#define LOCAL_DEBUG
+//#define LOCAL_DEBUG
 #include "myLogger.h"
 
 #include "config.h"
+#include "def.h"
 
 typedef enum
 {
@@ -27,13 +28,13 @@ typedef enum
     up
 } button_e;
 
-typedef enum
-{
-    hold_position,
-    autonom,
-    adjust_on,
-    NN
-} switch_e;
+// typedef enum
+// {
+//     hold_position,
+//     autonom_mode,
+//     adjust_on,
+//     fly_mode
+// } switch_e;
 
 ezButton buttonArray[] =
     {
@@ -72,12 +73,10 @@ class Keyboard : public Task::Base
 {
 
 protected:
+    keyboard_t *_keyboard;
     keyboard_t __keyboard;
 
 private:
-public:
-    keyboard_t *_keyboard;
-
 public:
     Keyboard(const String &name)
         : Task::Base(name)
@@ -90,7 +89,7 @@ public:
         _keyboard = _model;
         LOGGER_VERBOSE("....leave");
         return this;
-    }
+    } //---------------------- end of setModel --------------------------------------------------//
 
     virtual void begin() override
     {
@@ -103,18 +102,14 @@ public:
             switchArray[i].setDebounceTime(50);
         }
 
-    } //---------------------- end of begin -----------------------------------------------//
+    } //---------------------- end of begin -----------------------------------------------------//
 
     virtual void update() override
     {
         readJoyStick();
         readModeSwitch();
-        getSwitchState();
         readAdjustButtons();
-
-        // _keyboard.battery = analogRead(PIN_BATTERY);
-        // LOGGER_NOTICE_FMT("Battery has %i Volt",_keyboard->battery);
-    } //---------------------- end of update ------------------------------------------------------//
+    } //---------------------- end of update ----------------------------------------------------//
 
     void alert()
     {
@@ -131,7 +126,7 @@ public:
             digitalWrite(PIN_BUZZER, LOW);
     } //---------------------- end of alert ------------------------------------------------------//
 
-    void getSwitchState()
+/*    void getSwitchState()
     {
         for (byte i = 0; i < SWITCH_NUM; i++)
             switchArray[i].loop(); // MUST call the loop() function first
@@ -142,8 +137,8 @@ public:
             LOGGER_NOTICE_FMT("Switch state %i ", _keyboard->swiState[i]);
         }
         delay(1000);
-    } //---------------------- end of getSwitchState ---------------------------------------------//
-
+    } //---------------------- end of getSwitchState --------------------------------------------//
+*/
     void readJoyStick()
     {
         // map is considering +/- 100 %
@@ -236,7 +231,6 @@ public:
                 case 0:
                     _keyboard->_throttleOffset++;
                     LOGGER_NOTICE_FMT("_throttleOffset++ %i", _keyboard->_throttleOffset);
-                    LOGGER_NOTICE_FMT(" Real throttle: %i", _keyboard->throttle);
                     break;
                 case 1:
                     _keyboard->_yawOffset++;
@@ -289,31 +283,51 @@ public:
         for (byte i = 0; i < SWITCH_NUM; i++)
             switchArray[i].loop(); // MUST call the loop() function first
 
-        if (switchArray[0].isPressed())
+        if (switchArray[switch_e::autonom_mode].isPressed())
         {
-            _keyboard->swiState[0] = true;
-            LOGGER_NOTICE("Switch 0 Autonom");
+            _keyboard->swiState[switch_e::autonom_mode] = true;
+            LOGGER_NOTICE("Switch autonom");
+        }
+        else if (switchArray[switch_e::autonom_mode].isReleased())
+        {
+            _keyboard->swiState[switch_e::autonom_mode] = false;
+            LOGGER_NOTICE("Switch autonom released");
         }
 
-        else if (switchArray[1].isPressed())
+        else if (switchArray[switch_e::hold_position].isPressed())
         {
-            _keyboard->swiState[1] = true;
-            LOGGER_NOTICE("Switch 1 Hold Altitude");
+            _keyboard->swiState[switch_e::hold_position] = true;
+            LOGGER_NOTICE("Switch Hold Altitude");
+        }
+        else if (switchArray[switch_e::hold_position].isReleased())
+        {
+            _keyboard->swiState[switch_e::hold_position] = false;
+            LOGGER_NOTICE("Switch Hold Altitude released");
         }
 
-        else if (switchArray[2].isPressed())
+        else if (switchArray[switch_e::fly_mode].isPressed())
         {
-            _keyboard->swiState[2] = true;
-            LOGGER_NOTICE("Switch 2 NN");
+            _keyboard->swiState[switch_e::fly_mode] = true;
+            LOGGER_NOTICE("Switch Fly mode");
+        }
+        else if (switchArray[switch_e::fly_mode].isReleased())
+        {
+            _keyboard->swiState[switch_e::fly_mode] = false;
+            LOGGER_NOTICE("Switch Fly mode released");
         }
 
-        else if (switchArray[3].isReleased())
+        else if (switchArray[switch_e::adjust_on].isPressed())
         {
-            _keyboard->swiState[3] = true;
-            LOGGER_NOTICE_FMT("Switch 3 Adjust %i", _keyboard->swiState[3]);
+            _keyboard->swiState[switch_e::adjust_on] = true;
+            LOGGER_NOTICE("Switch 3 Adjust mode");
+        }
+        else if (switchArray[switch_e::adjust_on].isReleased())
+        {
+            _keyboard->swiState[switch_e::adjust_on] = false;
+            LOGGER_NOTICE("Switch 3 released");
         }
 
     } //---------------------- end of readModeSwitch --------------------------------------------//
 };
 /*--------------------------- end of keyboard class ---------------------------------------------*/
-#endif // MY_CONTROLLER_H
+#endif // MY_KEYBOARD_H

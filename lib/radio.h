@@ -14,7 +14,6 @@
 
 typedef struct __attribute__((__packed__))
 {
-  float checksum;
   int16_t rcYaw; //!< Get the positions of the rc joysticks
   int8_t rcPitch;
   int8_t rcRoll;
@@ -27,9 +26,9 @@ typedef struct __attribute__((__packed__))
 
 typedef struct __attribute__((__packed__))
 {
-  float yaw; // Fluglage MPU9250
-  float pitch;
-  float roll;
+  int16_t yaw; // Fluglage MPU9250
+  int8_t secondaryAxis;
+  int8_t primaryAxis;
   uint16_t altitude;       // MS5611
   float temperature;       // MPU9250
   float pressure;          // MS5611
@@ -103,7 +102,7 @@ public:
     {
       digitalWrite(LED_RADIO, LOW);
       
-      write_to_the_drohne();
+      //write_to_the_drohne();
 
       if (_radio->available())
       {                                                                // is there an ACK payload? grab the pipe number that received it
@@ -125,8 +124,8 @@ public:
   void read_from_the_drohne()
   {
     LOGGER_NOTICE_FMT_CHK(RC_interface->RX_payload.yaw, debugRX_payload.yaw, "Received Yaw = %i", RC_interface->RX_payload.yaw);
-    LOGGER_NOTICE_FMT_CHK(RC_interface->RX_payload.pitch, debugRX_payload.pitch, "Received Pitch = %i", RC_interface->RX_payload.pitch);
-    LOGGER_NOTICE_FMT_CHK(RC_interface->RX_payload.roll, debugRX_payload.roll, "Received Roll = %i", RC_interface->RX_payload.roll);
+    LOGGER_NOTICE_FMT_CHK(RC_interface->RX_payload.secondaryAxis, debugRX_payload.secondaryAxis, "Received Pitch = %i", RC_interface->RX_payload.secondaryAxis);
+    LOGGER_NOTICE_FMT_CHK(RC_interface->RX_payload.primaryAxis, debugRX_payload.primaryAxis, "Received Roll = %i", RC_interface->RX_payload.primaryAxis);
     LOGGER_NOTICE_FMT_CHK(RC_interface->RX_payload.temperature, debugRX_payload.temperature, "Received temperature = %i *C", RC_interface->RX_payload.temperature);
     LOGGER_NOTICE_FMT_CHK(RC_interface->RX_payload.pressure, debugRX_payload.pressure, "Received pressure = %i hP", RC_interface->RX_payload.pressure);
     LOGGER_NOTICE_FMT_CHK(RC_interface->RX_payload.altitude, debugRX_payload.altitude, "Received Alt = %i cm", RC_interface->RX_payload.altitude);
