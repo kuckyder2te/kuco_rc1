@@ -1,6 +1,6 @@
 # Hardware
 ## Controller
-ARD MEGA2560 PRO Arduino kompatibles Mega 2560 Pro Board
+MEGA2560 PRO Arduino kompatibles Mega 2560 Pro Board
 ![MEGA2560](../images/MEGA2560_mini.jpg)
 
 • ATmega2560-16AU<br>
@@ -21,7 +21,7 @@ ARD MEGA2560 PRO Arduino kompatibles Mega 2560 Pro Board
 ## PinOut
 ![MEGA2560_mini_a](../images/MEGA2560_mini_pinout_a.jpg) 
 ![MEGA2560_mini_b](../images/MEGA2560_mini_pinout_b.jpg)  
-![MEGA2560_mini_Dimension](../images/MEGA2560_mini_Dimension.jpg)   
+![MEGA2560_mini_Dimension](../images/MEGA2560_mini_Dimension.JPG)   
 
 ## Circut Board
 ![Top](../images/board_top.JPG)
