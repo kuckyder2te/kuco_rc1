@@ -1,7 +1,7 @@
 # Hardware
 ## Controller
 ARD MEGA2560 PRO Arduino kompatibles Mega 2560 Pro Board
-![RP2040](../images/MEGA2560_mini.jpg)
+![MEGA2560](../images/MEGA2560_mini.jpg)
 
 • ATmega2560-16AU<br>
 • 256 KB Flash<br>
