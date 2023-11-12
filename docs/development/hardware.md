@@ -16,7 +16,7 @@ MEGA2560 PRO Arduino kompatibles Mega 2560 Pro Board<br>
 • 800 mA Ausgangsstrom<br>
 • 16 MHz Frequenz<br>
 • MicroUSB zu UART<br>
-• Maße (LxB): 55 x 38 mm
+• Maße (LxB): 55 x 38 mm<br>
 
 ## PinOut
 ![MEGA2560_mini_a](../images/MEGA2560_mini_pinout_a.JPG) 
