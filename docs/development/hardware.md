@@ -51,7 +51,7 @@ Unterstützung bis zu sechs kanäle von daten empfang
 
 
 ## Alarm
-**aktiver Summer kontinuierlicher Piepton 12*9,5mm 5V**
+**aktiver Summer kontinuierlicher Piepton 12*9,5mm 5V**<br>
 ![Buzzer](../images/Buzzer.jpg)
 
 |Funkt. |Pin |D|
