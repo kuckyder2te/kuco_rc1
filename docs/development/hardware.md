@@ -29,6 +29,7 @@ MEGA2560 PRO Arduino kompatibles Mega 2560 Pro Board
 
 ## Radio: nRF24L01
 ![NRF24](../images/NRF24L01_E01-ML01DP5.jpg)
+![NRF241](../images/NRF24_pinout.JPG)
 
 Spezifikationen:
 Frequenz: 2,4 GHz ~ 2,5 GHz
