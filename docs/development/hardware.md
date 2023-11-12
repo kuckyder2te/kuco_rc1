@@ -1,7 +1,7 @@
 # Hardware
 ## Controller: MEGA2560 mini PRO
 MEGA2560 PRO Arduino kompatibles Mega 2560 Pro Board
-![MEGA2560](../images/MEGA2560_mini.jpg)
+![MEGA2560](../images/MEGA2560_mini.JPG)
 
 • ATmega2560-16AU<br>
 • 256 KB Flash<br>
@@ -27,10 +27,9 @@ MEGA2560 PRO Arduino kompatibles Mega 2560 Pro Board
 ![Top](../images/board_top.JPG)
 ![Bottom](../images/board_bottom.JPG)
 
-## Radio
-**NRF24**
-![NRF24](../images/NRF24.JPG)
-![NRF24_Antenne](../images/NRF24_with_antenne.JPG)
+## Radio: nRF24L01
+![NRF24](../images/NRF24L01_E01-ML01DP5.jpg)
+
 Spezifikationen:
 Frequenz: 2,4 GHz ~ 2,5 GHz
 Betriebs spannung: 3 ~ 3,6 V Max
