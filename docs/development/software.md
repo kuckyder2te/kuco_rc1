@@ -13,7 +13,6 @@ https://youtu.be/JBvnB0279-Q?si=LplhdbVDn-7sKslk
 
 ##  Select axis and coefficient.
 
-
 **"X"** selects the primary axis and sets a "1" with setItemAxis()
 
 Afterward<br>

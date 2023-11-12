@@ -1,5 +1,5 @@
 # Hardware
-## Controller
+## Controller: MEGA2560 mini PRO
 MEGA2560 PRO Arduino kompatibles Mega 2560 Pro Board
 ![MEGA2560](../images/MEGA2560_mini.jpg)
 
