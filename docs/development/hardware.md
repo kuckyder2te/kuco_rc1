@@ -19,8 +19,7 @@ MEGA2560 PRO Arduino kompatibles Mega 2560 Pro Board<br>
 • Maße (LxB): 55 x 38 mm<br>
 
 ## PinOut
-![MEGA2560_mini_a](../images/MEGA2560_mini_pinout_a.JPG) 
-![MEGA2560_mini_b](../images/MEGA2560_mini_pinout_b.JPG)  
+![MEGA2560_mini](../images/MEGA2560_mini_pinout.jpg) 
 ![MEGA2560_mini_Dimension](../images/MEGA2560_mini_Dimension.JPG)   
 
 ## Circut Board
