@@ -50,7 +50,7 @@ Unterstützung bis zu sechs kanäle von daten empfang
 | GND  |    |    |Black|      |
 
 
-## Alarm
+## Alarm: activ buzzer
 **aktiver Summer kontinuierlicher Piepton 12*9,5mm 5V**<br>
 ![Buzzer](../images/Buzzer.jpg)
 
