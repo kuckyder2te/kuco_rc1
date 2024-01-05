@@ -10,6 +10,7 @@
 
 #include <Arduino.h>
 #include <TaskManager.h>
+#include <Adafruit_PCD8544.h>
 #include "config.h"
 #include "def.h"
 
