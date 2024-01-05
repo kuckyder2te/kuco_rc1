@@ -6,11 +6,10 @@
 #include <SPI.h>
 #include <RF24.h>
 #include <../lib/myLogger.h>
+#include "def.h"
 
 #define LOCAL_DEBUG
 #include "myLogger.h"
-
-
 
 typedef struct __attribute__((__packed__))
 {
@@ -76,7 +75,6 @@ public:
 
   virtual void begin() override
   {
-
     _radio = new RF24(PIN_CE, PIN_CSN);
 
     if (!_radio->begin())
@@ -93,7 +91,7 @@ public:
     _radio->openWritingPipe(pipe_TX);
     _radio->openReadingPipe(1, pipe_RX);
     _radio->stopListening(); // put radio in TX mode
-  }                          //---------------------- end of begin ------------------------------------------------------//
+  }//---------------------- end of begin ------------------------------------------------------//
 
   virtual void update() override
   {
@@ -102,12 +100,12 @@ public:
     {
       digitalWrite(LED_RADIO, LOW);
       
-      //write_to_the_drohne();
+      write_to_the_drohne();
 
       if (_radio->available())
       {                                                                // is there an ACK payload? grab the pipe number that received it
         _radio->read(&RC_interface->RX_payload, sizeof(RX_payload_t)); // get incoming ACK payload
-        read_from_the_drohne();
+      //  read_from_the_drohne();
       }
       else
       {
@@ -137,15 +135,15 @@ public:
   void write_to_the_drohne()
   {
     LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcThrottle, debugTX_payload.rcThrottle, "Throttle = %i", RC_interface->TX_payload.rcThrottle);
-    LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcYaw, debugTX_payload.rcYaw, "Yaw = %i", RC_interface->TX_payload.rcYaw);
-    LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcPitch, debugTX_payload.rcPitch, "Pitch = %i", RC_interface->TX_payload.rcPitch);
-    LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcRoll, debugTX_payload.rcRoll, "Roll = %i", RC_interface->TX_payload.rcRoll);
+    // LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcYaw, debugTX_payload.rcYaw, "Yaw = %i", RC_interface->TX_payload.rcYaw);
+    // LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcPitch, debugTX_payload.rcPitch, "Pitch = %i", RC_interface->TX_payload.rcPitch);
+    // LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcRoll, debugTX_payload.rcRoll, "Roll = %i", RC_interface->TX_payload.rcRoll);
 
-    LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi[0], debugTX_payload.rcSwi[0], "Swi 0 = %i", RC_interface->TX_payload.rcSwi[0]);
-    LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi[1], debugTX_payload.rcSwi[1], "Swi 1 = %i", RC_interface->TX_payload.rcSwi[1]);
+    // LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi[0], debugTX_payload.rcSwi[0], "Swi 0 = %i", RC_interface->TX_payload.rcSwi[0]);
+    // LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi[1], debugTX_payload.rcSwi[1], "Swi 1 = %i", RC_interface->TX_payload.rcSwi[1]);
     
-    LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcAltitudeBaroAdj, debugTX_payload.rcAltitudeBaroAdj, "Adjus Hoehe = %i", RC_interface->TX_payload.rcAltitudeBaroAdj);
-    LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcAltitudeSonicAdj, debugTX_payload.rcAltitudeSonicAdj, "Adjust Ground = %i", RC_interface->TX_payload.rcAltitudeSonicAdj);
+    // LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcAltitudeBaroAdj, debugTX_payload.rcAltitudeBaroAdj, "Adjus Hoehe = %i", RC_interface->TX_payload.rcAltitudeBaroAdj);
+    // LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcAltitudeSonicAdj, debugTX_payload.rcAltitudeSonicAdj, "Adjust Ground = %i", RC_interface->TX_payload.rcAltitudeSonicAdj);
   }
 };
 /*------------------------- end of radio class --------------------------------------------------*/

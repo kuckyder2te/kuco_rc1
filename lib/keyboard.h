@@ -77,6 +77,8 @@ protected:
     keyboard_t __keyboard;
 
 private:
+
+
 public:
     Keyboard(const String &name)
         : Task::Base(name)
@@ -107,8 +109,8 @@ public:
     virtual void update() override
     {
         readJoyStick();
-        readModeSwitch();
-        readAdjustButtons();
+        //readModeSwitch();
+        //readAdjustButtons();
     } //---------------------- end of update ----------------------------------------------------//
 
     void alert()
@@ -142,18 +144,28 @@ public:
     void readJoyStick()
     {
         // map is considering +/- 100 %
-        _keyboard->throttle = map((analogRead(PIN_THROTTLE)), 0, 1023, -100, 100) + _keyboard->_throttleOffset;
+        //_keyboard->throttle = map((analogRead(PIN_THROTTLE)), 0, 1023, -80, 80) + _keyboard->_throttleOffset;
+         _keyboard->throttle = calcAnalogValue(analogRead(PIN_THROTTLE));
         LOGGER_NOTICE_FMT_CHK(_keyboard->throttle, __keyboard.throttle, "Throttle: %i", _keyboard->throttle);
-        _keyboard->yaw = map((analogRead(PIN_YAW)), 0, 1023, -100, 100) + _keyboard->_yawOffset;
-        _keyboard->pitch = map((analogRead(PIN_PITCH)), 0, 1023, -15, 15) + _keyboard->_pitchOffset;
-        _keyboard->roll = map((analogRead(PIN_ROLL)), 0, 1023, -15, 15 + _keyboard->_rollOffset);
-
-        _keyboard->altitude = map((analogRead(PIN_ALTITUDE)), 0, 1013, 0, 100);
-        _keyboard->distance_down = map(analogRead(PIN_DISTANCE_DOWN), 0, 1023, 0, 200);
+        _keyboard->yaw = calcAnalogValue(analogRead(PIN_YAW));
+        _keyboard->pitch = calcAnalogValue(analogRead(PIN_PITCH));
+        _keyboard->roll = calcAnalogValue(analogRead(PIN_ROLL));
+        _keyboard->altitude = calcAnalogValue(analogRead(PIN_ALTITUDE));
+        _keyboard->distance_down = calcAnalogValue(analogRead(PIN_DISTANCE_DOWN));
         // _keyboard->battery = map(analogRead(PIN_BATTERY), 0, 1023, 0, 100);
         //_keyboard->battery = analogRead(PIN_BATTERY);
     } //---------------------- end of readJoyStick ----------------------------------------------//
 
+    int16_t calcAnalogValue(int16_t value){
+        int16_t res;
+        res = map(value, 0, 1023, -ANALOG_MAX, ANALOG_MAX);
+        if((res<ZERO_WINDOW) && (res > -ZERO_WINDOW)){
+            return 0;
+        }else{
+            (res<0?res+=ZERO_WINDOW:res-=ZERO_WINDOW);
+            return res;
+        }
+    }
     void readAdjustButtons()
     {
         static uint8_t _chooseJS = 0;
