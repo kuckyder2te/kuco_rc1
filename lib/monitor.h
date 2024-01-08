@@ -15,7 +15,7 @@
 
 #include "model.h"
 
-#define LOCAL_DEBUG
+//#define LOCAL_DEBUG
 #include "myLogger.h"
 
 char strBuf[100];
