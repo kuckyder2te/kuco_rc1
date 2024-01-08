@@ -1,17 +1,15 @@
 #pragma once
 /*  File name : display.h
-    Project name : KuCo_Phantom 1
-    Author: Wilhelm Kuckelsberg
-    Date : 2022-
+    Project name : KuckyCopter
+    Author: Wilhelm Kuckelsberg / Stephan Scholz
+    Date : 2024-01-07
 
     Description : Drohne
-
 */
 
 #include <Arduino.h>
 #include <TaskManager.h>
-#include <Adafruit_PCD8544.h>
-#include "config.h"
+#include <Adafruit_ILI9341.h>
 #include "def.h"
 
 #include "..\lib\model.h"
@@ -23,7 +21,7 @@ class Display : public Task::Base
 {
 
 protected:
-    Adafruit_PCD8544 *_nokia;
+    Adafruit_ILI9341 *_tft;
 
 private:
     model_t *_model;
@@ -54,110 +52,135 @@ public:
 
     virtual void begin() override
     {
-        _nokia = new Adafruit_PCD8544(PIN_NOKIA_CLK, PIN_NOKIA_DIN, PIN_NOKIA_DC, PIN_NOKIA_CS, PIN_NOKIA_RST);
+        _tft = new Adafruit_ILI9341(PIN_TFT_CLK, PIN_TFT_DC, PIN_TFT_CS, PIN_TFT_RST, PIN_TFT_MOSI, PIN_TFT_MISO);
 
-        _nokia->begin();
-        _nokia->setContrast(60);
-        _nokia->display();
-        delay(100);
-        _nokia->clearDisplay();
+        _tft->begin();
+        
+          // read diagnostics (optional but can help debug problems)
+        uint8_t x = _tft->readcommand8(ILI9341_RDMODE);
+        Serial.print("Display Power Mode: 0x"); Serial.println(x, HEX);
+        x = _tft->readcommand8(ILI9341_RDMADCTL);
+        Serial.print("MADCTL Mode: 0x"); Serial.println(x, HEX);
+        x = _tft->readcommand8(ILI9341_RDPIXFMT);
+        Serial.print("Pixel Format: 0x"); Serial.println(x, HEX);
+        x = _tft->readcommand8(ILI9341_RDIMGFMT);
+        Serial.print("Image Format: 0x"); Serial.println(x, HEX);
+        x = _tft->readcommand8(ILI9341_RDSELFDIAG);
+        Serial.print("Self Diagnostic: 0x"); Serial.println(x, HEX); 
+        
+        Serial.println(F("Benchmark                Time (microseconds)"));
+        delay(10);
+        
+        Serial.print(F("Text                     "));
+        Serial.println(testText());
+        delay(3000);
 
-        _nokia->display();
-        _nokia->setTextSize(2);
-        _nokia->setTextColor(BLACK);
-        _nokia->setCursor(0, 0);
-        _nokia->println("Kucky");
-        _nokia->setCursor(10, 25);
-        _nokia->println("Copter");
-        _nokia->display();
-        delay(2000);
-        _nokia->clearDisplay();
+        Serial.print(F("Lines                    "));
+        Serial.println(testLines(ILI9341_CYAN));
+        delay(500);
 
     } /*--------------------- end of begin -----------------------------------------------------*/
 
     virtual void update() override
     {
-        if (_keyboard->swiState[switch_e::adjust_on])
-        {
-            LOGGER_NOTICE("Display adjust screen");
-            adjust_screen();
-        }
-        else
+        // if (_keyboard->swiState[switch_e::adjust_on])
+        // {
+        //     LOGGER_NOTICE("Display adjust screen");
+        //     adjust_screen();
+        // }
+        // else
         {
             LOGGER_NOTICE("Display fly screen");
-            print_FlyScreen();
+
         }
 
     } /*--------------------- end of update -----------------------------------------------------*/
 
-    void adjust_screen()
-    {
-        _nokia->clearDisplay();
+    unsigned long testLines(uint16_t color) {
+    unsigned long start, t;
+    int           x1, y1, x2, y2,
+                    w = _tft->width(),
+                    h = _tft->height();
 
-        _nokia->setTextSize(1);
-        _nokia->setTextColor(BLACK);
-        _nokia->setCursor(10, 0);
-        _nokia->println("Adjust JS");
-        _nokia->display();
+    _tft->fillScreen(ILI9341_BLACK);
+    yield();
+    
+    x1 = y1 = 0;
+    y2    = h - 1;
+    start = micros();
+    for(x2=0; x2<w; x2+=6) _tft->drawLine(x1, y1, x2, y2, color);
+    x2    = w - 1;
+    for(y2=0; y2<h; y2+=6) _tft->drawLine(x1, y1, x2, y2, color);
+    t     = micros() - start; // fillScreen doesn't count against timing
 
-        _nokia->setCursor(0, 10);
-        _nokia->println("Throttle:");
-        _nokia->setCursor(60, 10);
-        _nokia->println(_model->keyboard.throttle);
-        _nokia->display();
+    yield();
+    _tft->fillScreen(ILI9341_BLACK);
+    yield();
 
-        _nokia->setCursor(0, 20);
-        _nokia->println("YAW:");
-        _nokia->setCursor(60, 20);
-        _nokia->println(_model->keyboard.yaw);
-        _nokia->display();
+    x1    = w - 1;
+    y1    = 0;
+    y2    = h - 1;
+    start = micros();
+    for(x2=0; x2<w; x2+=6) _tft->drawLine(x1, y1, x2, y2, color);
+    x2    = 0;
+    for(y2=0; y2<h; y2+=6) _tft->drawLine(x1, y1, x2, y2, color);
+    t    += micros() - start;
 
-        _nokia->setCursor(0, 30);
-        _nokia->println("Pitch:");
-        _nokia->setCursor(60, 30);
-        _nokia->println(_model->keyboard.pitch);
-        _nokia->display();
+    yield();
+    _tft->fillScreen(ILI9341_BLACK);
+    yield();
 
-        _nokia->setCursor(0, 40);
-        _nokia->println("Roll:");
-        _nokia->setCursor(60, 40);
-        _nokia->println(_model->keyboard.roll);
-        _nokia->display();
-    } //---------------------- end of adjust_screen ------------------------------------------------------//
+    x1    = 0;
+    y1    = h - 1;
+    y2    = 0;
+    start = micros();
+    for(x2=0; x2<w; x2+=6) _tft->drawLine(x1, y1, x2, y2, color);
+    x2    = w - 1;
+    for(y2=0; y2<h; y2+=6) _tft->drawLine(x1, y1, x2, y2, color);
+    t    += micros() - start;
 
-    void print_FlyScreen()
-    {
-            _nokia->clearDisplay();
+    yield();
+    _tft->fillScreen(ILI9341_BLACK);
+    yield();
 
-        _nokia->setTextSize(1);
-        _nokia->setTextColor(BLACK);
-        _nokia->setCursor(10, 0);
-        _nokia->println("Flyscreen");
-        _nokia->display();
+    x1    = w - 1;
+    y1    = h - 1;
+    y2    = 0;
+    start = micros();
+    for(x2=0; x2<w; x2+=6) _tft->drawLine(x1, y1, x2, y2, color);
+    x2    = 0;
+    for(y2=0; y2<h; y2+=6) _tft->drawLine(x1, y1, x2, y2, color);
 
-        _nokia->setCursor(0, 10);
-        _nokia->println("Throttle:");
-        _nokia->setCursor(60, 10);
-        _nokia->println(_model->RC_interface.RX_payload.altitude); 
-        _nokia->display();
+    yield();
+    return micros() - start;
+    }//-------------------------- end of testLines --------------------------------------------------//
 
-        _nokia->setCursor(0, 20);
-        _nokia->println("YAW:");
-        _nokia->setCursor(60, 20);
-        _nokia->println(_model->RC_interface.TX_payload.rcAltitudeSonicAdj);
-        _nokia->display();
+    unsigned long testText() {
+    _tft->fillScreen(ILI9341_BLACK);
+    unsigned long start = micros();
+    _tft->setCursor(0, 0);
+    _tft->setTextColor(ILI9341_WHITE);  _tft->setTextSize(1);
+    _tft->println("KuckyCopter");
+    _tft->setTextColor(ILI9341_YELLOW); _tft->setTextSize(2);
+    _tft->println(1234.56);
+    _tft->setTextColor(ILI9341_RED);    _tft->setTextSize(3);
+    _tft->println(0xDEADBEEF, HEX);
+    _tft->println();
+    _tft->setTextColor(ILI9341_GREEN);
+    _tft->setTextSize(5);
+    _tft->println("Groop");
+    _tft->setTextSize(2);
+    _tft->println("I implore thee,");
+    _tft->setTextSize(1);
+    _tft->println("my foonting turlingdromes.");
+    _tft->println("And hooptiously drangle me");
+    _tft->println("with crinkly bindlewurdles,");
+    _tft->println("Or I will rend thee");
+    _tft->println("in the gobberwarts");
+    _tft->println("with my blurglecruncheon,");
+    _tft->println("see if I don't!");
+    return micros() - start;
+    }//-------------------------- end of testText --------------------------------------------------//
 
-        _nokia->setCursor(0, 30);
-        _nokia->println("Pitch:");
-        _nokia->setCursor(60, 30);
-        _nokia->println(_model->keyboard.pitch);
-        _nokia->display();
-
-        _nokia->setCursor(0, 40);
-        _nokia->println("Roll:");
-        _nokia->setCursor(60, 40);
-        _nokia->println(_model->keyboard.roll);
-        _nokia->display();
-    } //---------------------- end of printFlyScreen ------------------------------------------------------//
 };
 /*------------------------- end of display class ------------------------------------------------*/

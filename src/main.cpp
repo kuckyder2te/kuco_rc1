@@ -16,12 +16,7 @@
 #include <SPI.h>
 #include <Adafruit_SPIDevice.h>
 #include <Adafruit_GFX.h>
-#include <Adafruit_ILI9341.h>
-#include <Adafruit_ILI9341.h>
 #include <TaskManager.h>
-
-#include "config.h"
-#include "..\resources\intro.h"
 #include "..\lib\radio.h"
 #include "..\lib\keyboard.h"
 #include "..\lib\model.h"
@@ -39,13 +34,18 @@ void base_setup()
   Serial2.begin(BT_SPEED);
   Serial.println("Serial COM OK");
   Serial2.println("BT COM OK ");
+  
+  Serial.println("********************************");
+  Serial.println("*       KuCoCopter RC          *");
+  Serial.println("*                              *");
+  Serial.print("*     ");
   Serial.print(__DATE__);
   Serial.print(" ");
-  Serial.println(__TIME__);
-
-  pinMode(LED_RADIO, OUTPUT);
-  digitalWrite(LED_RADIO, LOW);
-
+  Serial.print(__TIME__);
+  Serial.println("     *");
+  Serial.println("********************************");
+  Serial.flush();
+ 
   pinMode(LED_MAINLOOP, OUTPUT); // green
   digitalWrite(LED_MAINLOOP, LOW);
 
@@ -65,8 +65,7 @@ void base_setup()
   LOGGER_NOTICE("Program will initialized");
 
     Wire.begin();
-
-}
+}//-------------------------- end of basesetup --------------------------------------------------//
 
 #ifdef _MAIN
 
@@ -94,30 +93,33 @@ void main_loop()
   model.RC_interface.TX_payload.rcSwi[1] = model.keyboard.swiState[1];
   model.RC_interface.TX_payload.rcSwi[2] = model.keyboard.swiState[2];
   model.RC_interface.TX_payload.rcSwi[3] = model.keyboard.swiState[3];
-  model.RC_interface.TX_payload.rcAltitudeBaroAdj = model.keyboard.altitude;
+  model.RC_interface.TX_payload.rcSwi[2] = model.keyboard.swiState[4];
+  model.RC_interface.TX_payload.rcSwi[3] = model.keyboard.swiState[5];
   model.RC_interface.TX_payload.rcAltitudeSonicAdj = model.keyboard.distance_down;
   model.RC_interface.TX_payload.rcAltitudeSonicAdj = model.keyboard.distance_front;
   if (millis() - _lastMillis > 1000)
   {
-    _lastMillis = millis();
-
     LOGGER_NOTICE_FMT("Throttle = %i Yaw = %i Pitch = %i Roll %i,", 
                       (uint16_t)model.keyboard.throttle,
                       (uint16_t)model.keyboard.yaw,
                       (uint16_t)model.keyboard.pitch,
                       (uint16_t)model.keyboard.roll);
 
-    // LOGGER_NOTICE_FMT("Swi 1 = %i Swi2 = %i Swi3 = %i,", (uint16_t)model.keyboard.swi1State,
-    //                   (uint16_t)model.keyboard.swi2State,
-    //                   (uint16_t)model.keyboard.swi3State);
+    LOGGER_NOTICE_FMT("Swi1 = %i Swi2 = %i Swi3 = %i Swi4 = %i Swi5 = %i Swi6 = %i,", 
+                      (uint16_t)model.keyboard.swiState[0],
+                      (uint16_t)model.keyboard.swiState[1],
+                      (uint16_t)model.keyboard.swiState[2],
+                      (uint16_t)model.keyboard.swiState[3],
+                      (uint16_t)model.keyboard.swiState[4],
+                      (uint16_t)model.keyboard.swiState[5]);                     
 
-    LOGGER_NOTICE_FMT("Altitude = %i Ground = %i Front = %i,", (uint16_t)model.RC_interface.RX_payload.altitude,
-                      (uint16_t)model.RC_interface.RX_payload.distance_down,
-                      (uint16_t)model.RC_interface.RX_payload.distance_front);
+    LOGGER_NOTICE_FMT("Ground = %i Front = %i,", (uint16_t)model.RC_interface.RX_payload.distance_down,
+                                                 (uint16_t)model.RC_interface.RX_payload.distance_front);
 
    LOGGER_NOTICE_FMT("Temp: %i",(uint16_t)model.RC_interface.RX_payload.temperature);
    LOGGER_NOTICE_FMT("Batt.: %i",(uint16_t)model.RC_interface.RX_payload.battery);
-    // Serial.println(model.RC_interface.RX_payload.temperature);
+
+   _lastMillis = millis();
   }
 
   digitalWrite(LED_MAINLOOP, HIGH);

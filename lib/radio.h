@@ -75,6 +75,9 @@ public:
 
   virtual void begin() override
   {
+    pinMode(LED_RADIO, OUTPUT);
+    digitalWrite(LED_RADIO, LOW);
+    
     _radio = new RF24(PIN_CE, PIN_CSN);
 
     if (!_radio->begin())
