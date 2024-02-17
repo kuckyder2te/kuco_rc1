@@ -13,27 +13,27 @@
 
 typedef struct __attribute__((__packed__))
 {
-  int16_t rcYaw; //!< Get the positions of the rc joysticks
-  int8_t rcPitch;
-  int8_t rcRoll;
-  int16_t rcThrottle;
-  uint16_t rcAltitudeSonicAdj;
-  uint16_t rcAltitudeBaroAdj;
-  bool rcSwi[4];
+  int16_t rcYaw; //!< Get the positions of the rc joysticks  // 2 bytes
+  int8_t rcPitch;                                            // 1    
+  int8_t rcRoll;                                             // 1
+  int16_t rcThrottle;                                        // 2
+  uint16_t rcAltitudeSonicAdj;                               // 2
+  uint16_t rcAltitudeBaroAdj;                                // 2
+  bool rcSwi[SWITCH_NUM];                                    // 10  Sum 20 byte
   
 } TX_payload_t; // sendet zur Drohne
 
 typedef struct __attribute__((__packed__))
 {
-  int16_t yaw; // Fluglage MPU9250
-  int8_t secondaryAxis;
-  int8_t primaryAxis;
-  uint16_t altitude;       // MS5611
-  float temperature;       // MPU9250
-  float pressure;          // MS5611
-  uint16_t distance_down;  // US Sensor looks down
-  uint16_t distance_front; // US Sensor looks ahead
-  uint16_t battery;        // State of the battery
+  int16_t yaw; // Fluglage MPU9250                            // 2 bytes
+  int8_t secondaryAxis;                                       // 1
+  int8_t primaryAxis;                                         // 1
+  uint16_t altitude;       // MS5611                          // 2
+  float temperature;       // MPU9250                         // 4
+  float pressure;          // MS5611                          // 4
+  uint16_t distance_down;  // US Sensor looks down            // 2
+  uint16_t distance_front; // US Sensor looks ahead           // 2
+  uint16_t battery;        // State of the battery            // 2   Sum 20 bytes
 } RX_payload_t;            // empfängt Daten von der Drohne
 
 typedef struct
@@ -43,8 +43,8 @@ typedef struct
   TX_payload_t TX_payload;
 } RC_interface_t;
 
-void read_from_the_drohne();
-void write_to_the_drohne();
+// void read_from_the_drohne();
+// void write_to_the_drohne();
 
 class Radio : public Task::Base
 {
@@ -142,9 +142,35 @@ public:
     // LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcPitch, debugTX_payload.rcPitch, "Pitch = %i", RC_interface->TX_payload.rcPitch);
     // LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcRoll, debugTX_payload.rcRoll, "Roll = %i", RC_interface->TX_payload.rcRoll);
 
-    // LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi[0], debugTX_payload.rcSwi[0], "Swi 0 = %i", RC_interface->TX_payload.rcSwi[0]);
-    // LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi[1], debugTX_payload.rcSwi[1], "Swi 1 = %i", RC_interface->TX_payload.rcSwi[1]);
-    
+      for (byte i = 0; i < SWITCH_NUM; i++) {
+        if(RC_interface->TX_payload.rcSwi[i]){
+            LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi[i], debugTX_payload.rcSwi[i], 
+                                  "Switch is pressed %i", RC_interface->TX_payload.rcSwi[i]);
+            }
+        else
+            LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi[i], debugTX_payload.rcSwi[i], 
+                                  "Switch is released %i", RC_interface->TX_payload.rcSwi[i]);
+      }  
+/*
+    LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi[0], debugTX_payload.rcSwi[0], 
+                                          "Swi 0 = %i", RC_interface->TX_payload.rcSwi[0]);
+    LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi[1], debugTX_payload.rcSwi[1],
+                                          "Swi 1 = %i", RC_interface->TX_payload.rcSwi[1]);
+    LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi[2], debugTX_payload.rcSwi[2],
+                                          "Swi 2 = %i", RC_interface->TX_payload.rcSwi[2]);
+    LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi[3], debugTX_payload.rcSwi[3],
+                                          "Swi 3 = %i", RC_interface->TX_payload.rcSwi[3]);
+    LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi[4], debugTX_payload.rcSwi[4],
+                                          "Swi 4 = %i", RC_interface->TX_payload.rcSwi[4]);
+    LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi[5], debugTX_payload.rcSwi[5],
+                                          "Swi 5 = %i", RC_interface->TX_payload.rcSwi[5]);
+    LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi[6], debugTX_payload.rcSwi[6],
+                                          "Swi 6 = %i", RC_interface->TX_payload.rcSwi[6]);
+    LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi[7], debugTX_payload.rcSwi[5],
+                                          "Swi 5 = %i", RC_interface->TX_payload.rcSwi[5]);
+    LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcSwi[8], debugTX_payload.rcSwi[6],
+                                          "Swi 6 = %i", RC_interface->TX_payload.rcSwi[6]);                                      
+*/ 
     // LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcAltitudeBaroAdj, debugTX_payload.rcAltitudeBaroAdj, "Adjus Hoehe = %i", RC_interface->TX_payload.rcAltitudeBaroAdj);
     // LOGGER_NOTICE_FMT_CHK(RC_interface->TX_payload.rcAltitudeSonicAdj, debugTX_payload.rcAltitudeSonicAdj, "Adjust Ground = %i", RC_interface->TX_payload.rcAltitudeSonicAdj);
   }

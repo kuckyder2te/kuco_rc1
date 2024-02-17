@@ -36,7 +36,7 @@ void base_setup()
   Serial2.println("BT COM OK ");
   
   Serial.println("********************************");
-  Serial.println("*       KuCoCopter RC          *");
+  Serial.println("*       KuCoCopter RC_1        *");
   Serial.println("*                              *");
   Serial.print("*     ");
   Serial.print(__DATE__);
