@@ -4,7 +4,7 @@
     Author: Wilhelm Kuckelsberg / Stephan Scholz
     Date : 2023-09-06
 
-    Description : RC
+    Description : Radio Control
 */
 
 /* generally */
