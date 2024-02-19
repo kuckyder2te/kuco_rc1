@@ -19,7 +19,7 @@ typedef struct __attribute__((__packed__))
   int16_t rcThrottle;                                        // 2
   uint16_t rcAltitudeSonicAdj;                               // 2
   uint16_t rcAltitudeBaroAdj;                                // 2
-  bool rcSwi[SWITCH_NUM];                                    // 10  Sum 20 byte
+  bool rcSwi[SWITCH_NUM];                                    // 10  Sum 10 byte
   
 } TX_payload_t; // sendet zur Drohne
 
