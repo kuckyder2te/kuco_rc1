@@ -13,13 +13,13 @@
 #include <TaskManager.h>
 #include <ezButton.h>
 
-//#define LOCAL_DEBUG
+#define LOCAL_DEBUG
 #include "myLogger.h"
 #include "def.h"
 
 // typedef enum
 // {
-//     option_1a,    
+//     option_1a,
 //     option_1b,
 //     option_2a,
 //     option_2b,
@@ -39,8 +39,7 @@ ezButton switchArray[] =
         ezButton(PIN_SWITCH_5b),
         ezButton(PIN_SWITCH_6),
         ezButton(PIN_SWITCH_7),
-        ezButton(PIN_SWITCH_8)
-        };
+        ezButton(PIN_SWITCH_8)};
 
 typedef struct
 {
@@ -59,8 +58,6 @@ protected:
     keyboard_t __keyboard;
 
 private:
-
-
 public:
     Keyboard(const String &name)
         : Task::Base(name)
@@ -85,6 +82,7 @@ public:
 
     virtual void update() override
     {
+        //   Serial.println("updated keyboard");
         readAnalogInputs();
         // readSwitchState();
         getSwitchState();
@@ -108,47 +106,55 @@ public:
     void getSwitchState()
     {
         for (byte i = 0; i < SWITCH_NUM; i++)
+        {
             switchArray[i].loop(); // MUST call the loop() function first
-
+         //   Serial.println(i);
+        }
         for (byte i = 0; i < SWITCH_NUM; i++)
         {
+           // Serial.print("i ");Serial.println(i);
             _keyboard->swiState[i] = switchArray[i].getState();
-            LOGGER_NOTICE_FMT("Switch state %i ", _keyboard->swiState[i]);
+            LOGGER_NOTICE_FMT("Switch state %i %i ", i, _keyboard->swiState[i]);
         }
-        delay(100);     // temp_debug
+        delay(2000); // temp_debug
     } //---------------------- end of getSwitchState --------------------------------------------//
 
-    void readAnalogInputs()                 /* read 2 Jojsticks 2 Potis and 1 Temperature sensor */ 
+    void readAnalogInputs() /* read 2 Jojsticks 2 Potis and 1 Temperature sensor */
     {
-        _keyboard->throttle = calcAnalogValue(analogRead(PIN_THROTTLE));
-        LOGGER_NOTICE_FMT_CHK(_keyboard->throttle, __keyboard.throttle, "Throttle: %i", _keyboard->throttle);
+        // _keyboard->throttle = calcAnalogValue(analogRead(PIN_THROTTLE));
+        // LOGGER_NOTICE_FMT_CHK(_keyboard->throttle, __keyboard.throttle, "Throttle: %i", _keyboard->throttle);
 
-        _keyboard->yaw = calcAnalogValue(analogRead(PIN_YAW));
-        LOGGER_NOTICE_FMT_CHK(_keyboard->yaw, __keyboard.yaw, "Yaw: %i", _keyboard->yaw);
+        // _keyboard->yaw = calcAnalogValue(analogRead(PIN_YAW));
+        // LOGGER_NOTICE_FMT_CHK(_keyboard->yaw, __keyboard.yaw, "Yaw: %i", _keyboard->yaw);
 
-        _keyboard->pitch = calcAnalogValue(analogRead(PIN_PITCH));
-        LOGGER_NOTICE_FMT_CHK(_keyboard->pitch, __keyboard.pitch, "Pitch: %i", _keyboard->pitch);
+        // _keyboard->pitch = calcAnalogValue(analogRead(PIN_PITCH));
+        // LOGGER_NOTICE_FMT_CHK(_keyboard->pitch, __keyboard.pitch, "Pitch: %i", _keyboard->pitch);
 
-        _keyboard->roll = calcAnalogValue(analogRead(PIN_ROLL));
-        LOGGER_NOTICE_FMT_CHK(_keyboard->roll, __keyboard.roll, "Roll: %i", _keyboard->roll);
+        // _keyboard->roll = calcAnalogValue(analogRead(PIN_ROLL));
+        // LOGGER_NOTICE_FMT_CHK(_keyboard->roll, __keyboard.roll, "Roll: %i", _keyboard->roll);
 
         _keyboard->distance_down = map(analogRead(PIN_DISTANCE_DOWN), 0, 200, 0, 1023);
         LOGGER_NOTICE_FMT_CHK(_keyboard->distance_down, __keyboard.distance_down, "Down: %i", _keyboard->distance_down);
 
         _keyboard->distance_front = map(analogRead(PIN_DISTANCE_FRONT), 0, 200, 0, 1023);
-         LOGGER_NOTICE_FMT_CHK(_keyboard->distance_front, __keyboard.distance_front, "Front: %i", _keyboard->distance_front);
-   
+        LOGGER_NOTICE_FMT_CHK(_keyboard->distance_front, __keyboard.distance_front, "Front: %i", _keyboard->distance_front);
+
         _keyboard->battery = map(analogRead(PIN_BATTERY), 0, 1023, 0, 100);
+        LOGGER_NOTICE_FMT_CHK(_keyboard->battery, __keyboard.battery, "Battrey: %i", _keyboard->battery);
 
     } //---------------------- end of readJoyStick ----------------------------------------------//
 
-    int16_t calcAnalogValue(int16_t value){
+    int16_t calcAnalogValue(int16_t value)
+    {
         int16_t res;
         res = map(value, 0, 1023, -ANALOG_MAX, ANALOG_MAX);
-        if((res < ZERO_WINDOW) && (res > -ZERO_WINDOW)){
+        if ((res < ZERO_WINDOW) && (res > -ZERO_WINDOW))
+        {
             return 0;
-        }else{
-            (res<0?res+=ZERO_WINDOW:res-=ZERO_WINDOW);
+        }
+        else
+        {
+            (res < 0 ? res += ZERO_WINDOW : res -= ZERO_WINDOW);
             return res;
         }
     } //---------------------- end of calcAnalogValue -------------------------------------------//
@@ -158,12 +164,14 @@ public:
         for (byte i = 0; i < SWITCH_NUM; i++)
             switchArray[i].loop(); // MUST call the loop() function first
 
-        for (byte i = 0; i < SWITCH_NUM; i++) {
-            if(_keyboard->swiState[i])
-                LOGGER_NOTICE("Switch %i is pressed", i);
-            else
-                LOGGER_NOTICE("Switch %i is released", i);
-        }  
+        for (byte i = 0; i < SWITCH_NUM; i++)
+        {
+            if (_keyboard->swiState[i])
+                LOGGER_NOTICE_FMT("Switch %i is pressed", i);
+
+             if (!_keyboard->swiState[i])
+                 LOGGER_NOTICE_FMT("Switch %i is released", i);
+         }
         /*
         if (switchArray[switch_e::option_1a].isPressed())
         {
@@ -234,7 +242,7 @@ public:
         {
             _keyboard->swiState[switch_e::option_5] = false;
             LOGGER_NOTICE("option_5 is released");
-        }  
+        }
         */
     } //---------------------- end of readSwitchState --------------------------------------------//
 };

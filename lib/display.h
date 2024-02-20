@@ -14,7 +14,7 @@
 
 #include "..\lib\model.h"
 
-//#define LOCAL_DEBUG
+#define LOCAL_DEBUG
 #include "myLogger.h"
 
 class Display : public Task::Base
@@ -52,7 +52,7 @@ public:
 
     virtual void begin() override
     {
-        _tft = new Adafruit_ILI9341(PIN_TFT_CLK, PIN_TFT_DC, PIN_TFT_CS, PIN_TFT_RST, PIN_TFT_MOSI, PIN_TFT_MISO);
+        _tft = new Adafruit_ILI9341(PIN_TFT_CS, PIN_TFT_DC, PIN_TFT_MOSI, PIN_TFT_CLK, PIN_TFT_RST, PIN_TFT_MISO);
 
         _tft->begin();
         
