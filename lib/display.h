@@ -9,13 +9,17 @@
 
 #include <Arduino.h>
 #include <TaskManager.h>
+#include <Adafruit_GFX.h>
 #include <Adafruit_ILI9341.h>
+
 #include "def.h"
 
 #include "..\lib\model.h"
 
 #define LOCAL_DEBUG
 #include "myLogger.h"
+
+
 
 class Display : public Task::Base
 {
@@ -29,7 +33,7 @@ private:
 
 public:
     keyboard_t *_keyboard;
-
+    
 public:
     /// @brief Constructor
     /// @param name
@@ -55,6 +59,8 @@ public:
         _tft = new Adafruit_ILI9341(PIN_TFT_CS, PIN_TFT_DC, PIN_TFT_MOSI, PIN_TFT_CLK, PIN_TFT_RST, PIN_TFT_MISO);
 
         _tft->begin();
+
+        delay(20);
         
           // read diagnostics (optional but can help debug problems)
         uint8_t x = _tft->readcommand8(ILI9341_RDMODE);
@@ -68,21 +74,28 @@ public:
         x = _tft->readcommand8(ILI9341_RDSELFDIAG);
         Serial.print("Self Diagnostic: 0x"); Serial.println(x, HEX); 
         
-        Serial.println(F("Benchmark                Time (microseconds)"));
-        delay(10);
+        // Serial3.println(F("Benchmark                Time (microseconds)"));
+        // delay(10);
         
-        Serial.print(F("Text                     "));
-        Serial.println(testText());
-        delay(3000);
+        // Serial3.print(F("Text                     "));
+        // Serial3.println(testText());
+        // delay(3000);
 
-        Serial.print(F("Lines                    "));
-        Serial.println(testLines(ILI9341_CYAN));
-        delay(500);
+        // Serial3.print(F("Lines                    "));
+        // Serial3.println(testLines(ILI9341_CYAN));
+        // delay(500);
 
     } /*--------------------- end of begin -----------------------------------------------------*/
 
     virtual void update() override
     {
+       _tft->setCursor(0, 0);
+    _tft->setTextColor(ILI9341_WHITE);  _tft->setTextSize(1);
+    _tft->println("KuckyCopter");
+    Serial.println("KuckyCopter");
+    Serial3.println("KuckyCopter on BT");
+    //delay(5000);
+
         // if (_keyboard->swiState[switch_e::adjust_on])
         // {
         //     LOGGER_NOTICE("Display adjust screen");
