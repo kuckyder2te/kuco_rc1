@@ -33,13 +33,13 @@ ezButton switchArray[] =
         ezButton(PIN_SWITCH_1),
         ezButton(PIN_SWITCH_2),
         ezButton(PIN_SWITCH_3),
-        ezButton(PIN_SWITCH_4a),
-        ezButton(PIN_SWITCH_4b),
-        ezButton(PIN_SWITCH_5a),
-        ezButton(PIN_SWITCH_5b),
+        ezButton(PIN_SWITCH_4),
+        ezButton(PIN_SWITCH_5),
         ezButton(PIN_SWITCH_6),
         ezButton(PIN_SWITCH_7),
-        ezButton(PIN_SWITCH_8)};
+        ezButton(PIN_SWITCH_8),
+        ezButton(PIN_SWITCH_9),
+        ezButton(PIN_SWITCH_10)};
 
 typedef struct
 {
@@ -82,10 +82,10 @@ public:
 
     virtual void update() override
     {
-        //   Serial.println("updated keyboard");
-        readAnalogInputs();
-        // readSwitchState();
-        getSwitchState();
+        //Serial.println("updated keyboard");
+         readAnalogInputs();
+        //readSwitchState();
+         //getSwitchState();
     } //---------------------- end of update ----------------------------------------------------//
 
     void alert()
@@ -108,16 +108,15 @@ public:
         for (byte i = 0; i < SWITCH_NUM; i++)
         {
             switchArray[i].loop(); // MUST call the loop() function first
-         //   Serial.println(i);
         }
         for (byte i = 0; i < SWITCH_NUM; i++)
         {
-           // Serial.print("i ");Serial.println(i);
+            // Serial.print("i ");Serial.println(i);
             _keyboard->swiState[i] = switchArray[i].getState();
             LOGGER_NOTICE_FMT("Switch state %i %i ", i, _keyboard->swiState[i]);
         }
         delay(2000); // temp_debug
-    } //---------------------- end of getSwitchState --------------------------------------------//
+    }                //---------------------- end of getSwitchState --------------------------------------------//
 
     void readAnalogInputs() /* read 2 Jojsticks 2 Potis and 1 Temperature sensor */
     {
@@ -162,88 +161,31 @@ public:
     void readSwitchState()
     {
         for (byte i = 0; i < SWITCH_NUM; i++)
+        {
             switchArray[i].loop(); // MUST call the loop() function first
+        //    Serial.print(i);
+        }
 
         for (byte i = 0; i < SWITCH_NUM; i++)
         {
-            if (_keyboard->swiState[i])
-                LOGGER_NOTICE_FMT("Switch %i is pressed", i);
+            if (switchArray[i].isPressed())
+            {
+                Serial.print("The button ");
+                Serial.print(i + 1);
+                Serial.println(" is pressed");
+                _keyboard->swiState[i] = switchArray[i].getState();
+                LOGGER_NOTICE_FMT("The button %i is pressed %i state", i, _keyboard->swiState[i]);
+            }
 
-             if (!_keyboard->swiState[i])
-                 LOGGER_NOTICE_FMT("Switch %i is released", i);
-         }
-        /*
-        if (switchArray[switch_e::option_1a].isPressed())
-        {
-            _keyboard->swiState[switch_e::option_1a] = true;
-            LOGGER_NOTICE("option_1a is pressed");
+            if (switchArray[i].isReleased())
+            {
+                Serial.print("The button ");
+                Serial.print(i + 1);
+                Serial.println(" is released");
+                _keyboard->swiState[i] = switchArray[i].getState();
+                LOGGER_NOTICE_FMT("The button %i is released %i state", i, _keyboard->swiState[i]);
+            }
         }
-        else if (switchArray[switch_e::option_1a].isReleased())
-        {
-            _keyboard->swiState[switch_e::option_1a] = false;
-            LOGGER_NOTICE("option_1a released");
-        }
-        else if (switchArray[switch_e::option_1b].isPressed())
-        {
-            _keyboard->swiState[switch_e::option_1b] = true;
-            LOGGER_NOTICE("option_1b is pressed");
-        }
-        else if (switchArray[switch_e::option_1b].isReleased())
-        {
-            _keyboard->swiState[switch_e::option_1b] = false;
-            LOGGER_NOTICE("option_1b released");
-        }
-        else if (switchArray[switch_e::option_2a].isPressed())
-        {
-            _keyboard->swiState[switch_e::option_2a] = true;
-            LOGGER_NOTICE("option_2a is pressed");
-        }
-        else if (switchArray[switch_e::option_2a].isReleased())
-        {
-            _keyboard->swiState[switch_e::option_2a] = false;
-            LOGGER_NOTICE("option_2a is released");
-        }
-        else if (switchArray[switch_e::option_2b].isPressed())
-        {
-            _keyboard->swiState[switch_e::option_2b] = true;
-            LOGGER_NOTICE("option_2b is is pressed");
-        }
-        else if (switchArray[switch_e::option_2b].isReleased())
-        {
-            _keyboard->swiState[switch_e::option_2b] = false;
-            LOGGER_NOTICE("option_2b is released");
-        }
-        else if (switchArray[switch_e::option_3].isPressed())
-        {
-            _keyboard->swiState[switch_e::option_3] = true;
-            LOGGER_NOTICE("option_3 is is pressed");
-        }
-        else if (switchArray[switch_e::option_3].isReleased())
-        {
-            _keyboard->swiState[switch_e::option_3] = false;
-            LOGGER_NOTICE("option_3 is released");
-        }
-        else if (switchArray[switch_e::option_4].isPressed())
-        {
-            _keyboard->swiState[switch_e::option_4] = true;
-            LOGGER_NOTICE("option_4 is is pressed");
-        }
-        else if (switchArray[switch_e::option_4].isReleased())
-        {
-            _keyboard->swiState[switch_e::option_4] = false;
-            LOGGER_NOTICE("option_4 is released");
-        }
-        else if (switchArray[switch_e::option_5].isPressed())
-        {
-            _keyboard->swiState[switch_e::option_5] = true;
-            LOGGER_NOTICE("option_5 is is pressed");
-        }
-        else if (switchArray[switch_e::option_5].isReleased())
-        {
-            _keyboard->swiState[switch_e::option_5] = false;
-            LOGGER_NOTICE("option_5 is released");
-        }
-        */
     } //---------------------- end of readSwitchState --------------------------------------------//
 };
 /*--------------------------- end of keyboard class ---------------------------------------------*/

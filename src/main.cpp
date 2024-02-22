@@ -5,7 +5,7 @@
 
     Description : Drohne remote
     Hardware : Arduino MEGA2560 Mini
-               Display : Nokia 5110
+               Display : ILI9341 TFT 240 * 320
 
 */
 
@@ -15,7 +15,8 @@
 #include <Wire.h>
 #include <SPI.h>
 #include <Adafruit_SPIDevice.h>
-#include <Adafruit_GFX.h>
+//#include <Adafruit_ILI9341.h>
+
 #include <TaskManager.h>
 #include "..\lib\radio.h"
 #include "..\lib\keyboard.h"
@@ -23,7 +24,7 @@
 #include "..\lib\monitor.h"
 #include "..\lib\display.h"
 
-#define LOCAL_DEBUG
+//#define LOCAL_DEBUG
 #include "..\lib\myLogger.h"
 
 model_t model;
@@ -31,9 +32,9 @@ model_t model;
 void base_setup()
 {
   Serial.begin(COM_SPEED);
-  Serial2.begin(BT_SPEED);
+  Serial3.begin(BT_SPEED);
   Serial.println("Serial COM OK");
-  Serial2.println("BT COM OK ");
+  Serial.println("BT COM OK ");
   
   Serial.println("********************************");
   Serial.println("*       KuCoCopter RC_1        *");
@@ -71,10 +72,10 @@ void base_setup()
 
 void main_setup()
 {
-  Tasks.add<Radio>("radio")->setModel(&model.RC_interface)->startFps(10);
+  //Tasks.add<Radio>("radio")->setModel(&model.RC_interface)->startFps(10);
   Tasks.add<Keyboard>("keyboard")->setModel(&model.keyboard)->startFps(10);
   //Tasks.add<Monitor>("Monitor")->setModel(&model)->startFps(10);
-  Tasks.add<Display>("Display")->setModel(&model)->startFps(10);
+  //Tasks.add<Display>("Display")->setModel(&model)->startFps(10);
   Serial.println("setup done");
 }
 

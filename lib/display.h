@@ -19,8 +19,6 @@
 #define LOCAL_DEBUG
 #include "myLogger.h"
 
-
-
 class Display : public Task::Base
 {
 
@@ -33,7 +31,7 @@ private:
 
 public:
     keyboard_t *_keyboard;
-    
+
 public:
     /// @brief Constructor
     /// @param name
@@ -60,41 +58,49 @@ public:
 
         _tft->begin();
 
-        delay(20);
-        
-          // read diagnostics (optional but can help debug problems)
+        delay(100);
+
+        // read diagnostics (optional but can help debug problems)
         uint8_t x = _tft->readcommand8(ILI9341_RDMODE);
-        Serial.print("Display Power Mode: 0x"); Serial.println(x, HEX);
+        Serial.print("Display Power Mode: 0x");
+        Serial.println(x, HEX);
         x = _tft->readcommand8(ILI9341_RDMADCTL);
-        Serial.print("MADCTL Mode: 0x"); Serial.println(x, HEX);
+        Serial.print("MADCTL Mode: 0x");
+        Serial.println(x, HEX);
         x = _tft->readcommand8(ILI9341_RDPIXFMT);
-        Serial.print("Pixel Format: 0x"); Serial.println(x, HEX);
+        Serial.print("Pixel Format: 0x");
+        Serial.println(x, HEX);
         x = _tft->readcommand8(ILI9341_RDIMGFMT);
-        Serial.print("Image Format: 0x"); Serial.println(x, HEX);
+        Serial.print("Image Format: 0x");
+        Serial.println(x, HEX);
         x = _tft->readcommand8(ILI9341_RDSELFDIAG);
-        Serial.print("Self Diagnostic: 0x"); Serial.println(x, HEX); 
-        
-        // Serial3.println(F("Benchmark                Time (microseconds)"));
+        Serial.print("Self Diagnostic: 0x");
+        Serial.println(x, HEX);
+
+        // Serial.println(F("Benchmark                Time (microseconds)"));
         // delay(10);
-        
-        // Serial3.print(F("Text                     "));
-        // Serial3.println(testText());
+
+        // Serial.print(F("Text                     "));
+        // Serial.println(testText());
         // delay(3000);
 
-        // Serial3.print(F("Lines                    "));
-        // Serial3.println(testLines(ILI9341_CYAN));
+        // Serial.print(F("Lines                    "));
+        // Serial.println(testLines(ILI9341_CYAN));
         // delay(500);
 
     } /*--------------------- end of begin -----------------------------------------------------*/
 
     virtual void update() override
     {
-       _tft->setCursor(0, 0);
-    _tft->setTextColor(ILI9341_WHITE);  _tft->setTextSize(1);
-    _tft->println("KuckyCopter");
-    Serial.println("KuckyCopter");
-    Serial3.println("KuckyCopter on BT");
-    //delay(5000);
+        _tft->setCursor(0, 0);
+        _tft->setTextColor(ILI9341_BLUE);
+        _tft->setTextSize(1);
+        _tft->println("KuckyCopter");
+        
+        Serial.println("KuckyCopter");
+        Serial3.println("KuckyCopter on BT");
+
+        // delay(5000);
 
         // if (_keyboard->swiState[switch_e::adjust_on])
         // {
@@ -104,96 +110,107 @@ public:
         // else
         {
             LOGGER_NOTICE("Display fly screen");
-
         }
 
     } /*--------------------- end of update -----------------------------------------------------*/
 
-    unsigned long testLines(uint16_t color) {
-    unsigned long start, t;
-    int           x1, y1, x2, y2,
-                    w = _tft->width(),
-                    h = _tft->height();
+    unsigned long testLines(uint16_t color)
+    {
+        unsigned long start, t;
+        int x1, y1, x2, y2,
+            w = _tft->width(),
+            h = _tft->height();
 
-    _tft->fillScreen(ILI9341_BLACK);
-    yield();
-    
-    x1 = y1 = 0;
-    y2    = h - 1;
-    start = micros();
-    for(x2=0; x2<w; x2+=6) _tft->drawLine(x1, y1, x2, y2, color);
-    x2    = w - 1;
-    for(y2=0; y2<h; y2+=6) _tft->drawLine(x1, y1, x2, y2, color);
-    t     = micros() - start; // fillScreen doesn't count against timing
+        _tft->fillScreen(ILI9341_BLACK);
+        yield();
 
-    yield();
-    _tft->fillScreen(ILI9341_BLACK);
-    yield();
+        x1 = y1 = 0;
+        y2 = h - 1;
+        start = micros();
+        for (x2 = 0; x2 < w; x2 += 6)
+            _tft->drawLine(x1, y1, x2, y2, color);
+        x2 = w - 1;
+        for (y2 = 0; y2 < h; y2 += 6)
+            _tft->drawLine(x1, y1, x2, y2, color);
+        t = micros() - start; // fillScreen doesn't count against timing
 
-    x1    = w - 1;
-    y1    = 0;
-    y2    = h - 1;
-    start = micros();
-    for(x2=0; x2<w; x2+=6) _tft->drawLine(x1, y1, x2, y2, color);
-    x2    = 0;
-    for(y2=0; y2<h; y2+=6) _tft->drawLine(x1, y1, x2, y2, color);
-    t    += micros() - start;
+        yield();
+        _tft->fillScreen(ILI9341_BLACK);
+        yield();
 
-    yield();
-    _tft->fillScreen(ILI9341_BLACK);
-    yield();
+        x1 = w - 1;
+        y1 = 0;
+        y2 = h - 1;
+        start = micros();
+        for (x2 = 0; x2 < w; x2 += 6)
+            _tft->drawLine(x1, y1, x2, y2, color);
+        x2 = 0;
+        for (y2 = 0; y2 < h; y2 += 6)
+            _tft->drawLine(x1, y1, x2, y2, color);
+        t += micros() - start;
 
-    x1    = 0;
-    y1    = h - 1;
-    y2    = 0;
-    start = micros();
-    for(x2=0; x2<w; x2+=6) _tft->drawLine(x1, y1, x2, y2, color);
-    x2    = w - 1;
-    for(y2=0; y2<h; y2+=6) _tft->drawLine(x1, y1, x2, y2, color);
-    t    += micros() - start;
+        yield();
+        _tft->fillScreen(ILI9341_BLACK);
+        yield();
 
-    yield();
-    _tft->fillScreen(ILI9341_BLACK);
-    yield();
+        x1 = 0;
+        y1 = h - 1;
+        y2 = 0;
+        start = micros();
+        for (x2 = 0; x2 < w; x2 += 6)
+            _tft->drawLine(x1, y1, x2, y2, color);
+        x2 = w - 1;
+        for (y2 = 0; y2 < h; y2 += 6)
+            _tft->drawLine(x1, y1, x2, y2, color);
+        t += micros() - start;
 
-    x1    = w - 1;
-    y1    = h - 1;
-    y2    = 0;
-    start = micros();
-    for(x2=0; x2<w; x2+=6) _tft->drawLine(x1, y1, x2, y2, color);
-    x2    = 0;
-    for(y2=0; y2<h; y2+=6) _tft->drawLine(x1, y1, x2, y2, color);
+        yield();
+        _tft->fillScreen(ILI9341_BLACK);
+        yield();
 
-    yield();
-    return micros() - start;
-    }//-------------------------- end of testLines --------------------------------------------------//
+        x1 = w - 1;
+        y1 = h - 1;
+        y2 = 0;
+        start = micros();
+        for (x2 = 0; x2 < w; x2 += 6)
+            _tft->drawLine(x1, y1, x2, y2, color);
+        x2 = 0;
+        for (y2 = 0; y2 < h; y2 += 6)
+            _tft->drawLine(x1, y1, x2, y2, color);
 
-    unsigned long testText() {
-    _tft->fillScreen(ILI9341_BLACK);
-    unsigned long start = micros();
-    _tft->setCursor(0, 0);
-    _tft->setTextColor(ILI9341_WHITE);  _tft->setTextSize(1);
-    _tft->println("KuckyCopter");
-    _tft->setTextColor(ILI9341_YELLOW); _tft->setTextSize(2);
-    _tft->println(1234.56);
-    _tft->setTextColor(ILI9341_RED);    _tft->setTextSize(3);
-    _tft->println(0xDEADBEEF, HEX);
-    _tft->println();
-    _tft->setTextColor(ILI9341_GREEN);
-    _tft->setTextSize(5);
-    _tft->println("Groop");
-    _tft->setTextSize(2);
-    _tft->println("I implore thee,");
-    _tft->setTextSize(1);
-    _tft->println("my foonting turlingdromes.");
-    _tft->println("And hooptiously drangle me");
-    _tft->println("with crinkly bindlewurdles,");
-    _tft->println("Or I will rend thee");
-    _tft->println("in the gobberwarts");
-    _tft->println("with my blurglecruncheon,");
-    _tft->println("see if I don't!");
-    return micros() - start;
-    }//-------------------------- end of testText --------------------------------------------------//
+        yield();
+        return micros() - start;
+    } //-------------------------- end of testLines --------------------------------------------------//
 
+    unsigned long testText()
+    {
+        _tft->fillScreen(ILI9341_BLACK);
+        unsigned long start = micros();
+        _tft->setCursor(0, 0);
+        _tft->setTextColor(ILI9341_WHITE);
+        _tft->setTextSize(1);
+        _tft->println("KuckyCopter");
+        _tft->setTextColor(ILI9341_YELLOW);
+        _tft->setTextSize(2);
+        _tft->println(1234.56);
+        _tft->setTextColor(ILI9341_RED);
+        _tft->setTextSize(3);
+        _tft->println(0xDEADBEEF, HEX);
+        _tft->println();
+        _tft->setTextColor(ILI9341_GREEN);
+        _tft->setTextSize(5);
+        _tft->println("Groop");
+        _tft->setTextSize(2);
+        _tft->println("I implore thee,");
+        _tft->setTextSize(1);
+        _tft->println("my foonting turlingdromes.");
+        _tft->println("And hooptiously drangle me");
+        _tft->println("with crinkly bindlewurdles,");
+        _tft->println("Or I will rend thee");
+        _tft->println("in the gobberwarts");
+        _tft->println("with my blurglecruncheon,");
+        _tft->println("see if I don't!");
+        return micros() - start;
+    } //-------------------------- end of testText --------------------------------------------------//
 };
 /*------------------------- end of display class ------------------------------------------------*/
