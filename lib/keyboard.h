@@ -4,7 +4,7 @@
     Authors: Wilhelm Kuckelsberg / Stephan Scholz
     Date : 2023-09-03
 
-    Description : RC
+    Description : RC#emote Control
 
 */
 #ifndef MY_SENSORS_H
