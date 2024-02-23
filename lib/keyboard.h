@@ -4,7 +4,7 @@
     Authors: Wilhelm Kuckelsberg / Stephan Scholz
     Date : 2023-09-03
 
-    Description : RC
+    Description : RC#emote Control
 
 */
 #ifndef MY_SENSORS_H
@@ -121,10 +121,16 @@ public:
         delay(2000); // temp_debug
     }                //---------------------- end of getSwitchState --------------------------------------------//
 
+        //   Serial.println("updated keyboard");
+        readAnalogInputs();
+        readSwitchState();
+        // getSwitchState();
+    } //---------------------- end of update ----------------------------------------------------//
+
     void readAnalogInputs() /* read 2 Jojsticks 2 Potis and 1 Temperature sensor */
     {
-        // _keyboard->throttle = calcAnalogValue(analogRead(PIN_THROTTLE));
-        // LOGGER_NOTICE_FMT_CHK(_keyboard->throttle, __keyboard.throttle, "Throttle: %i", _keyboard->throttle);
+        //  _keyboard->throttle = calcAnalogValue(analogRead(PIN_THROTTLE));
+        //  LOGGER_NOTICE_FMT_CHK(_keyboard->throttle, __keyboard.throttle, "Throttle: %i", _keyboard->throttle);
 
         // _keyboard->yaw = calcAnalogValue(analogRead(PIN_YAW));
         // LOGGER_NOTICE_FMT_CHK(_keyboard->yaw, __keyboard.yaw, "Yaw: %i", _keyboard->yaw);
@@ -135,16 +141,62 @@ public:
         // _keyboard->roll = calcAnalogValue(analogRead(PIN_ROLL));
         // LOGGER_NOTICE_FMT_CHK(_keyboard->roll, __keyboard.roll, "Roll: %i", _keyboard->roll);
 
-        _keyboard->distance_down = map(analogRead(PIN_DISTANCE_DOWN), 0, 200, 0, 1023);
+        uint16_t temp = analogRead(PIN_DISTANCE_DOWN);
+        _keyboard->distance_down = map(analogRead(PIN_DISTANCE_DOWN), 0, 1023, 0, 200);
         LOGGER_NOTICE_FMT_CHK(_keyboard->distance_down, __keyboard.distance_down, "Down: %i", _keyboard->distance_down);
 
-        _keyboard->distance_front = map(analogRead(PIN_DISTANCE_FRONT), 0, 200, 0, 1023);
+        temp = analogRead(PIN_DISTANCE_FRONT);
+        _keyboard->distance_front = map(analogRead(PIN_DISTANCE_FRONT), 0, 1023, 0, 200);
         LOGGER_NOTICE_FMT_CHK(_keyboard->distance_front, __keyboard.distance_front, "Front: %i", _keyboard->distance_front);
 
+        temp = analogRead(PIN_BATTERY);
         _keyboard->battery = map(analogRead(PIN_BATTERY), 0, 1023, 0, 100);
-        LOGGER_NOTICE_FMT_CHK(_keyboard->battery, __keyboard.battery, "Battrey: %i", _keyboard->battery);
+        LOGGER_NOTICE_FMT_CHK(_keyboard->battery, __keyboard.battery, "Battery: %i temp: %i", _keyboard->battery, temp);
 
     } //---------------------- end of readJoyStick ----------------------------------------------//
+
+    void getSwitchState()
+    {
+        for (byte i = 0; i < SWITCH_NUM; i++)
+        {
+            switchArray[i].loop(); // MUST call the loop() function first
+        }
+        for (byte i = 0; i < SWITCH_NUM; i++)
+        {
+            _keyboard->swiState[i] = switchArray[i].getState();
+            LOGGER_NOTICE_FMT("Switch state %i %i ", i, _keyboard->swiState[i]);
+        }
+    } //---------------------- end of getSwitchState --------------------------------------------//
+
+    void readSwitchState()
+    {
+        for (byte i = 0; i < SWITCH_NUM; i++)
+        {
+            switchArray[i].loop(); // MUST call the loop() function first
+            //    Serial.print(i);
+        }
+
+        for (byte i = 0; i < SWITCH_NUM; i++)
+        {
+            if (switchArray[i].isPressed())
+            {
+                _keyboard->swiState[i] = true;
+                // Serial.print("The switch ");
+                // Serial.print(i + 1);
+                // Serial.println(" is pressed");
+                LOGGER_NOTICE_FMT("Switch is pressed %i %i ", i, _keyboard->swiState[i]);
+            }
+
+            if (switchArray[i].isReleased())
+            {
+                _keyboard->swiState[i] = false;
+                // Serial.print("The switch ");
+                // Serial.print(i + 1);
+                // Serial.println(" is released");
+                LOGGER_NOTICE_FMT("Switch is released %i %i ", i, _keyboard->swiState[i]);
+            }
+        }
+    } //---------------------- end of readSwitchState -------------------------------------------//
 
     int16_t calcAnalogValue(int16_t value)
     {
@@ -161,35 +213,20 @@ public:
         }
     } //---------------------- end of calcAnalogValue -------------------------------------------//
 
-    void readSwitchState()
+    void alert()
     {
-        for (byte i = 0; i < SWITCH_NUM; i++)
-        {
-            switchArray[i].loop(); // MUST call the loop() function first
-            //    Serial.print(i);
-        }
-
-        for (byte i = 0; i < SWITCH_NUM; i++)
-        {
-            if (switchArray[i].isPressed())
+        int lastMillis = millis();
+        if (_keyboard->battery > 50)
+            if (millis() - lastMillis > 1000)
             {
-                Serial.print("The button ");
-                Serial.print(i + 1);
-                Serial.println(" is pressed");
-                _keyboard->swiState[i] = switchArray[i].getState();
-                LOGGER_NOTICE_FMT("The button %i is pressed %i state", i, _keyboard->swiState[i]);
+                digitalWrite(PIN_BUZZER, HIGH);
+                lastMillis = millis();
             }
-
-            if (switchArray[i].isReleased())
-            {
-                Serial.print("The button ");
-                Serial.print(i + 1);
-                Serial.println(" is released");
-                _keyboard->swiState[i] = switchArray[i].getState();
-                LOGGER_NOTICE_FMT("The button %i is released %i state", i, _keyboard->swiState[i]);
-            }
-        }
-    } //---------------------- end of readSwitchState --------------------------------------------//
+            else
+                digitalWrite(PIN_BUZZER, LOW);
+        else
+            digitalWrite(PIN_BUZZER, LOW);
+    } //---------------------- end of alert -----------------------------------------------------//
 };
 /*--------------------------- end of keyboard class ---------------------------------------------*/
 #endif // MY_KEYBOARD_H
