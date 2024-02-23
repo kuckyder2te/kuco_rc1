@@ -36,10 +36,10 @@
 #define PIN_SWITCH_1  A12
 #define PIN_SWITCH_2  A14
 #define PIN_SWITCH_3  32
-#define PIN_SWITCH_4 34
-#define PIN_SWITCH_5 36
-#define PIN_SWITCH_6 38
-#define PIN_SWITCH_7 40
+#define PIN_SWITCH_4  34
+#define PIN_SWITCH_5  36
+#define PIN_SWITCH_6  38
+#define PIN_SWITCH_7  40
 #define PIN_SWITCH_8  42
 #define PIN_SWITCH_9  44
 #define PIN_SWITCH_10 46

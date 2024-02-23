@@ -76,16 +76,19 @@ public:
     {
         for (byte i = 0; i < SWITCH_NUM; i++)
         {
-            switchArray[i].setDebounceTime(50);
+            switchArray[i].setDebounceTime(50);// set debounce time to 50 milliseconds
         }
     } //---------------------- end of begin -----------------------------------------------------//
 
     virtual void update() override
     {
-        //Serial.println("updated keyboard");
-         readAnalogInputs();
-        //readSwitchState();
-         //getSwitchState();
+
+
+        
+        // Serial.println("updated keyboard");
+    //   readAnalogInputs();
+        // readSwitchState();
+        // getSwitchState();
     } //---------------------- end of update ----------------------------------------------------//
 
     void alert()
@@ -163,7 +166,7 @@ public:
         for (byte i = 0; i < SWITCH_NUM; i++)
         {
             switchArray[i].loop(); // MUST call the loop() function first
-        //    Serial.print(i);
+            //    Serial.print(i);
         }
 
         for (byte i = 0; i < SWITCH_NUM; i++)
