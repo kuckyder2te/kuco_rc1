@@ -15,8 +15,8 @@
 #include <Wire.h>
 #include <SPI.h>
 #include <Adafruit_SPIDevice.h>
-//#include <Adafruit_ILI9341.h>
-
+#include <Adafruit_GFX.h>
+#include <Adafruit_ILI9341.h>
 #include <TaskManager.h>
 #include "..\lib\radio.h"
 #include "..\lib\keyboard.h"
@@ -75,7 +75,7 @@ void main_setup()
   //Tasks.add<Radio>("radio")->setModel(&model.RC_interface)->startFps(10);
   Tasks.add<Keyboard>("keyboard")->setModel(&model.keyboard)->startFps(10);
   //Tasks.add<Monitor>("Monitor")->setModel(&model)->startFps(10);
-  //Tasks.add<Display>("Display")->setModel(&model)->startFps(10);
+  Tasks.add<Display>("Display")->setModel(&model)->startFps(10);
   Serial.println("setup done");
 }
 

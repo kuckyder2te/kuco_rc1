@@ -76,17 +76,35 @@ public:
     {
         for (byte i = 0; i < SWITCH_NUM; i++)
         {
-            switchArray[i].setDebounceTime(50);// set debounce time to 50 milliseconds
+            switchArray[i].setDebounceTime(50); // set debounce time to 50 milliseconds
         }
     } //---------------------- end of begin -----------------------------------------------------//
 
     virtual void update() override
     {
+     //   Serial.println("update");
+    //    delay(100);
 
+        for (byte i = 0; i < SWITCH_NUM; i++)
+            switchArray[i].loop(); // MUST call the loop() function first
 
-        
-        // Serial.println("updated keyboard");
-    //   readAnalogInputs();
+        for (byte i = 0; i < SWITCH_NUM; i++)
+        {
+            if (switchArray[i].isPressed())
+            {
+                Serial.print("The button ");
+                Serial.print(i + 1);
+                Serial.println(" is pressed");
+            }
+
+            if (switchArray[i].isReleased())
+            {
+                Serial.print("The button ");
+                Serial.print(i + 1);
+                Serial.println(" is released");
+            }
+        }
+        //   readAnalogInputs();
         // readSwitchState();
         // getSwitchState();
     } //---------------------- end of update ----------------------------------------------------//
@@ -121,12 +139,6 @@ public:
         delay(2000); // temp_debug
     }                //---------------------- end of getSwitchState --------------------------------------------//
 
-        //   Serial.println("updated keyboard");
-        readAnalogInputs();
-        readSwitchState();
-        // getSwitchState();
-    } //---------------------- end of update ----------------------------------------------------//
-
     void readAnalogInputs() /* read 2 Jojsticks 2 Potis and 1 Temperature sensor */
     {
         //  _keyboard->throttle = calcAnalogValue(analogRead(PIN_THROTTLE));
@@ -154,19 +166,6 @@ public:
         LOGGER_NOTICE_FMT_CHK(_keyboard->battery, __keyboard.battery, "Battery: %i temp: %i", _keyboard->battery, temp);
 
     } //---------------------- end of readJoyStick ----------------------------------------------//
-
-    void getSwitchState()
-    {
-        for (byte i = 0; i < SWITCH_NUM; i++)
-        {
-            switchArray[i].loop(); // MUST call the loop() function first
-        }
-        for (byte i = 0; i < SWITCH_NUM; i++)
-        {
-            _keyboard->swiState[i] = switchArray[i].getState();
-            LOGGER_NOTICE_FMT("Switch state %i %i ", i, _keyboard->swiState[i]);
-        }
-    } //---------------------- end of getSwitchState --------------------------------------------//
 
     void readSwitchState()
     {
@@ -212,21 +211,6 @@ public:
             return res;
         }
     } //---------------------- end of calcAnalogValue -------------------------------------------//
-
-    void alert()
-    {
-        int lastMillis = millis();
-        if (_keyboard->battery > 50)
-            if (millis() - lastMillis > 1000)
-            {
-                digitalWrite(PIN_BUZZER, HIGH);
-                lastMillis = millis();
-            }
-            else
-                digitalWrite(PIN_BUZZER, LOW);
-        else
-            digitalWrite(PIN_BUZZER, LOW);
-    } //---------------------- end of alert -----------------------------------------------------//
 };
 /*--------------------------- end of keyboard class ---------------------------------------------*/
 #endif // MY_KEYBOARD_H

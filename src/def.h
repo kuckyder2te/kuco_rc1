@@ -12,7 +12,7 @@
 #define ANALOG_MAX (100 + ZERO_WINDOW)
 
 #define COM_SPEED 115200
-#define BT_SPEED  115200
+#define BT_SPEED  9600
 
 /* Alerts and controlls */
 #define PIN_BUZZER   10
