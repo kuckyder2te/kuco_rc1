@@ -86,15 +86,16 @@ public:
         Serial.print("Self Diagnostic: 0x");
         Serial.println(x, HEX);
 
-Serial.println("begin end");
+        Serial.println("begin end");
     } /*--------------------- end of begin -----------------------------------------------------*/
 
     virtual void update() override
     {
-        _tft->setCursor(0, 0);
-        _tft->setTextColor(ILI9341_BLUE);
-        _tft->setTextSize(1);
-        _tft->println("KuckyCopter");
+        showLogo();
+        // _tft->setCursor(0, 0);
+        // _tft->setTextColor(ILI9341_BLUE);
+        // _tft->setTextSize(1);
+        // _tft->println("KuckyCopter");
         
         Serial.println("KuckyCopter");
         Serial3.println("KuckyCopter on BT");
@@ -105,6 +106,20 @@ Serial.println("begin end");
 
     } /*--------------------- end of update -----------------------------------------------------*/
 
-
+void showLogo() {
+  _tft->fillScreen(ILI9341_BLACK);
+ 
+  _tft->setCursor(0, 0);
+  _tft->setTextColor(ILI9341_WHITE);  _tft->setTextSize(3);
+  _tft->println("Kucky Copter");
+  _tft->setTextColor(ILI9341_YELLOW); _tft->setTextSize(2);
+  _tft->println();
+  _tft->println("YAW");
+  _tft->setTextColor(ILI9341_RED);    _tft->setTextSize(2);
+  _tft->println();
+  _tft->println("Pitch");
+  _tft->println();
+  _tft->println("Roll");
+}
 };
 /*------------------------- end of display class ------------------------------------------------*/
