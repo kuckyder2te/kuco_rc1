@@ -72,10 +72,10 @@ void base_setup()
 
 void main_setup()
 {
-  //Tasks.add<Radio>("radio")->setModel(&model.RC_interface)->startFps(10);
-  Tasks.add<Keyboard>("keyboard")->setModel(&model.keyboard)->startFps(10);
+  Tasks.add<Radio>("radio")->setModel(&model.RC_interface)->startFps(10);
+//  Tasks.add<Keyboard>("keyboard")->setModel(&model.keyboard)->startFps(10);
   //Tasks.add<Monitor>("Monitor")->setModel(&model)->startFps(10);
-  Tasks.add<Display>("Display")->setModel(&model)->startFps(10);
+//  Tasks.add<Display>("Display")->setModel(&model)->startFps(10);
   Serial.println("setup done");
 }
 

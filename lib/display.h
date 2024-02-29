@@ -91,14 +91,14 @@ public:
 
     virtual void update() override
     {
-        showLogo();
+     //   showLogo();
         // _tft->setCursor(0, 0);
         // _tft->setTextColor(ILI9341_BLUE);
         // _tft->setTextSize(1);
         // _tft->println("KuckyCopter");
         
-        Serial.println("KuckyCopter");
-        Serial3.println("KuckyCopter on BT");
+        // Serial.println("KuckyCopter");
+        // Serial3.println("KuckyCopter on BT");
 
         // {
         //     LOGGER_NOTICE("Display fly screen");
